@@ -57,7 +57,7 @@
 	<cfset variables.ProPayStatusCodes["66"] = "Denied a ProPay account" />
 	<cfset variables.ProPayStatusCodes["67"] = "Unauthorized service requested" />
 	<cfset variables.ProPayStatusCodes["68"] = "Account not affiliated" />
-	<cfset variables.ProPayStatusCodes["69"] = "Duplicate invoice number (The same card was charged for the same amount with the same invoice number (including a blank invoice #) in a 1 hour period" />
+	<cfset variables.ProPayStatusCodes["69"] = "Duplicate invoice number (The same card was charged for the same amount with the same invoice number (including a blank invoice number) in a 1 hour period" />
 	<cfset variables.ProPayStatusCodes["70"] = "Duplicate external ID" />
 	<cfset variables.ProPayStatusCodes["71"] = "Account previously set up, but problem affiliating it with partner" />
 	<cfset variables.ProPayStatusCodes["72"] = "The ProPay Account has already been upgraded to a Premium Account" />
@@ -276,9 +276,11 @@
 		--->
 
 		<cfscript>
-			local = {};
-			results = "";
-			transactionResult = "";
+			var local = {};
+			var results = "";
+			var transactionResult = "";
+			var arrayParameters = [];
+			var i = "";
 			
 			local.p = arguments.payload.trim();
 			local.h["Content-Type"] = "text/xml";
@@ -296,69 +298,68 @@
 					
 					try 
 					{
-						transactionResult = XmlSearch(results,"//:XMLTrans"); /* this is the main info node in the returned XML payload */
+						transactionResult = XmlSearch(results,"//XMLTrans"); /* this is the main info node in the returned XML payload */
 
-						if ( isarray(transactionResult) && arraylen(transactionResult) == 1 ) 
+						if ( isarray(transactionResult) && arraylen(transactionResult) ) 
 						{
+							if ( structkeyexists(transactionResult[1], "XMLChildren") && ( isarray(transactionResult[1].XMLChildren) && arraylen(transactionResult[1].XMLChildren) ) )
+							{
+								arrayParameters = transactionResult[1].XMLChildren;
+								
+								for ( i=1; i <= arraylen(arrayParameters); i++ )
+								{
+									if ( arrayParameters[i].XmlName == "status" && structkeyexists(variables.ProPayStatusCodes,arrayParameters[i].XmlText) )
+									{	
+										local.processorData.setMessage(variables.ProPayStatusCodes[arrayParameters[i].XmlText]);
+									}
 
-							if ( structkeyexists(transactionResult[1], "Result") && structkeyexists(variables.ProPayResponseCodes,transactionResult[1].Result.xmlText) ) 
-							{
-								local.processorData.setMessage(variables.ProPayResponseCodes[transactionResult[1].Result.xmlText]);
-							}
-							else if ( structkeyexists(transactionResult[1], "Message") ) 
-							{
-								local.processorData.setMessage(transactionResult[1].Message.xmlText);
+									if ( arrayParameters[i].XmlName == "ResponseCode" && structkeyexists(variables.ProPayResponseCodes,arrayParameters[i].XmlText) )
+									{
+										local.processorData.setMessage(variables.ProPayResponseCodes[arrayParameters[i].XmlText]);
+									}
+
+									if ( arrayParameters[i].XmlName == "transNum" )
+									{
+										local.processorData.setTransactionID(arrayParameters[i].XmlText);
+									}
+
+									if ( arrayParameters[i].XmlName == "AVS" )
+									{
+										local.processorData.setAVSCode(arrayParameters[i].XmlText);
+									}
+
+									if ( arrayParameters[i].XmlName == "status" )
+									{
+										switch (arrayParameters[i].XmlText) 
+										{
+											case "00": 
+											{
+												local.processorData.setStatus(getService().getStatusSuccessful());
+												break;
+											}
+											case "58": 
+											{
+												local.processorData.setStatus(getService().getStatusDeclined());
+												break;
+											}
+											case "48": 
+											{
+												local.processorData.setStatus(getService().getStatusDeclined());
+												break;
+											}
+											default: 
+											{
+												local.processorData.setStatus(getService().getStatusFailure());
+												break;
+											}
+										}
+									}
+								}
 							}
 							else
 							{
-								local.processorData.setMessage("No message found.");
-							}
-							
-							if ( structkeyexists(transactionResult[1], "PNRef") ) 
-							{
-								local.processorData.setTransactionID(transactionResult[1].PNRef.xmlText);
-							}
-							
-							if ( structkeyexists(transactionResult[1], "AuthCode") ) 
-							{
-								local.processorData.setAuthorization(transactionResult[1].AuthCode.xmlText);
-							}
-							
-							if ( structkeyexists(transactionResult[1],"AVSResult") ) 
-							{
-								local.processorData.setAVSCode(transactionResult[1].AVSResult.xmlText);
-							}
-							
-							if ( structkeyexists(transactionResult[1], "Result") ) 
-							{
-								switch (transactionResult[1].Result.xmlText) 
-								{
-									case "0": 
-									{
-										local.processorData.setStatus(getService().getStatusSuccessful());
-										break;
-									}
-									case "12": 
-									{
-										local.processorData.setStatus(getService().getStatusDeclined());
-										break;
-									}
-									case "23": 
-									{
-										local.processorData.setStatus(getService().getStatusDeclined());
-										break;
-									}
-									case "126": 
-									{
-										local.processorData.setStatus(getService().getStatusSuccessful());
-										break;
-									}
-									default: 
-									{
-										local.processorData.setStatus(getService().getStatusFailure());
-										break;
-									}
-								}
+								local.processorData.setStatus(getService().getStatusUnknown());
+								local.processorData.setMessage("There were no children for the XMLTrans node. [#arraylen(transactionResult)#]");
 							}
 						}
 						else
