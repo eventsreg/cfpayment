@@ -94,7 +94,7 @@
 			local.processorData = createResponse(argumentCollection = super.process(payload = local.p, headers=local.h));
 			
 			if ( not local.processorData.hasError() ) {
-				if ( len(local.processorData.getResult()) and isXML(local.processorData.getResult()) ) {
+				if ( len(local.processorData.getResult()) > 0 && isXML(local.processorData.getResult()) ) {
 					
 					results = xmlParse(local.processorData.getResult());
 					local.processorData.setParsedResult(results);
