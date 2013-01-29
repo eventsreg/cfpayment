@@ -13,10 +13,10 @@
 
 		<cfscript>  
 			gw.path = "ProPay.ProPay";
-			gw.Username = 'eventsreg2';
-			gw.Password = 'Paragon2!';
-			gw.Partner = 'eventsreg';
-			gw.Vendor = 'eventsreg2';
+			gw.Username = '30831756';
+			gw.Password = '22e62fca4fc44b1a65863ca62a3668';
+			gw.Partner = '';
+			gw.Vendor = '';
 			gw.TestMode = true;
 
 			// create gw and get reference			
@@ -200,25 +200,6 @@
 		
 		<cfset response = gw.credit(money = money, transactionid = response.getTransactionID(), options = options) />
 		<cfset assertFalse(response.getSuccess(), "You should not be able to credit this sale transaction for a partial (greater than) amount, but this one worked.") />
-	</cffunction>
-	
-	<cffunction name="testNonReferencedCredit" access="public" returntype="void" output="false">
-		<cfset var money = variables.svc.createMoney(2000) /><!--- in cents, $20.00 --->
-		<cfset var response = "" />
-		<cfset var options = {} />
-		<cfset var transactionId = "" />
-		
-		<cfset options["cardType"] = "Visa" />
-		
-		<!---// non-referenced transaction is one with no PNREF identifier: must be allowed by account settings but default is not to allow them. //--->
-		<cfset response = gw.credit(money = money, transactionid = "", account = createValidCard(), options = options) />
-		<cfset debug(response.getMemento()) />
-		<cfset assertFalse(response.getSuccess(), "This non-referenced credit worked, even though the default is not to allow them.") />
-		
-		<!---// make sure invalid card numbers toss an error, if these are even allowed //--->
-		<cfset response = gw.credit(money = money, transactionid = "", account = createInvalidCard(), options = options) />
-		<cfset debug(response.getMemento()) />
-		<cfset assertFalse(response.getSuccess(), "This non-referenced credit was an invalid card number - it shouldn't have worked.") />
 	</cffunction>
 	
 	<!---// Private helper methods //--->
