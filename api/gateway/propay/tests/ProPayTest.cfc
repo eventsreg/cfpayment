@@ -35,6 +35,7 @@
 		<cfset options["cardType"] = "visa" />
 		<cfset options["comments"] = "This purchase was a test from E-vents Registration." />
 		<cfset options["description"] = "Test purchase from E-vents Registration." />
+		<cfset options["invoiceNumber"] = "purchase()--#createuuid()#" />
 		
 		<!---// gateway should allow valid card number //--->
 		<cfset response = gw.purchase(money = money, account = createValidCard(), options = options) />
@@ -62,9 +63,11 @@
 		<cfset options["cardType"] = "visa" />
 		<cfset options["comments"] = "This authorization was a test from E-vents Registration." />
 		<cfset options["description"] = "Test authorization from E-vents Registration." />
+		<cfset options["invoiceNumber"] = "authorization()--#createuuid()#" />
 		
 		<!---// test the authorize method(s) //--->
 		<cfset response = gw.authorize(money = money, account = createValidCard(), options = options) />
+		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "The authorization did not succeed.") />
 		
 		<!---// gateway should reject invalid card number //--->
@@ -84,8 +87,10 @@
 		<cfset options["cardType"] = "visa" />
 		<cfset options["comments"] = "This capture was a test from E-vents Registration." />
 		<cfset options["description"] = "Test capture from E-vents Registration." />
+		<cfset options["invoiceNumber"] = "capture()--#createuuid()#" />
 		
 		<cfset response = gw.authorize(money = money, account = createValidCard(), options = options) />
+		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "The authorization before the capture did not succeed.") />
 		
 		<cfset response = gw.capture(money = money, authorization = response.getTransactionId(), options = options) />
@@ -95,7 +100,7 @@
 	
 	<cffunction name="testVoid" access="public" returntype="void" output="false">
 		<!--- Minimum amount must be 100 (one dollar) --->
-		<cfset var money = variables.svc.createMoney(5000) /><!--- in cents, $50.00 --->
+		<cfset var money = variables.svc.createMoney(1000) /><!--- in cents, $50.00 --->
 		<cfset var response = "" />
 		<cfset var options = {} />
 		<cfset var transactionId = "Vxxxx" />
@@ -104,12 +109,15 @@
 		<cfset options["cardType"] = "visa" />
 		<cfset options["comments"] = "This void was a test from E-vents Registration." />
 		<cfset options["description"] = "Test void from E-vents Registration." />
+		<cfset options["invoiceNumber"] = "void()--#createuuid()#" />
 		
 		<!---// voiding an auth-only transaction //--->
 		<cfset response = gw.authorize(money = money, account = createValidCard(), options = options) />
+		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "The authorization before the void did not succeed.") />
 		
-		<cfset response = gw.void(id = response.getTransactionID(), options = options) />
+		<cfset response = gw.void(money = money, id = response.getTransactionID(), options = options) />
+		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "You cannot void this Authorization transaction.") />
 		
 		<!---// voiding a sale transaction //--->
@@ -117,13 +125,13 @@
 		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "The purchase before the void did not succeed.") />
 		
-		<cfset response = gw.void(id = response.getTransactionID(), options = options) />
+		<cfset response = gw.void(money = money, id = response.getTransactionID(), options = options) />
 		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "You cannot void this Sale transaction.") />
 		
 		<!---// void a non-existent transaction //--->
 		<cfset response.setTransactionID("VZZZZZZZZZZZZ") />
-		<cfset response = gw.void(id = response.getTransactionID(), options = options) />
+		<cfset response = gw.void(money = money, id = response.getTransactionID(), options = options) />
 		<cfset assertFalse(response.getSuccess(), "The void was approved, but it should not exist.") />
 	</cffunction> 
 	
@@ -138,28 +146,17 @@
 		<cfset options["cardType"] = "visa" />
 		<cfset options["comments"] = "Test status from E-vents Registration." />
 		<cfset options["description"] = "Transaction status from E-vents Registration." />
-		
-		<!---// getting status for an auth-only transaction //--->
-		<cfset response = gw.authorize(money = money, account = createValidCard(), options = options) />
-		<cfset assertTrue(response.getSuccess(), "The authorization before the status did not succeed.") />
-		
-		<cfset response = gw.status(transactionid = response.getTransactionID(), options = options) />
-		<cfset debug(response.getMemento()) />
-		<cfset assertTrue(response.getSuccess(), "You cannot get the status for this Authorization transaction.") />
+		<cfset options["cardholder"] = "John Doe" />
+		<cfset options["invoiceNumber"] = "void()--#createuuid()#" />
 		
 		<!---// getting status for a sale transaction //--->
 		<cfset response = gw.purchase(money = money, account = createValidCard(), options = options) />
+		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "The purchase before the status did not succeed.") />
 		
 		<cfset response = gw.status(transactionid = response.getTransactionID(), options = options) />
 		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "You cannot get the status for this Sale transaction.") />
-		
-		<!---// getting status for a non-existent transaction //--->
-		<cfset response.setTransactionID("VZZZZZZZZZZZZ") />
-		<cfset response = gw.status(transactionid = response.getTransactionID(), options = options) />
-		<cfset debug(response.getMemento()) />
-		<cfset assertFalse(response.getSuccess(), "The status for the transaction was fetched, but it should not exist.") />
 	</cffunction>
 	
 	<cffunction name="testReferencedCredit" access="public" returntype="void" output="false">
@@ -172,9 +169,11 @@
 		<cfset options["cardType"] = "visa" />
 		<cfset options["comments"] = "Test credit from E-vents Registration." />
 		<cfset options["description"] = "Testing credit from E-vents Registration" />
+		<cfset options["invoiceNumber"] = "credit()--#createuuid()#" />
 		
 		<!---// crediting a valid sale transaction //--->
 		<cfset response = gw.purchase(money = money, account = createValidCard(), options = options) />
+		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "The sale transaction before the credit did not succeed.") />
 		
 		<cfset response = gw.credit(money = money, transactionid = response.getTransactionID(), options = options) />
@@ -183,27 +182,30 @@
 		
 		<!---// getting status for a valid auth-only transaction: should fail, because these aren't allowed //--->
 		<cfset response = gw.authorize(money = money, account = createValidCard(), options = options) />
+		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "The Authorization only transaction before the credit did not succeed.") />
-		
-		<cfset response = gw.credit(money = money, transactionid = response.getTransactionID(), options = options) />
-		<cfset assertFalse(response.getSuccess(), "You cannot credit an Authorization transaction, but this one apparently worked.") />
 		
 		<!---// crediting a valid sale transaction, but only < the original amount //--->
 		<cfset response = gw.purchase(money = money, account = createValidCard(), options = options) />
+		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "The sale transaction before the credit did not succeed.") />
 		
 		<cfset money.setCents(500) />
 		
 		<cfset response = gw.credit(money = money, transactionid = response.getTransactionID(), options = options) />
-		<cfset assertTrue(response.getSuccess(), "You should be able to credit this sale transaction for a partial (less than) amount, but this one didn't work.") />
+		<cfset debug(response.getMemento()) />
+		<cfset assertFalse(response.getSuccess(), "You should be able to credit this sale transaction for a partial (less than) amount, but this one didn't work.") />
+		
 		
 		<!---// crediting a valid sale transaction, but trying an amount > the original amount //--->
 		<cfset response = gw.purchase(money = money, account = createValidCard(), options = options) />
+		<cfset debug(response.getMemento()) />
 		<cfset assertTrue(response.getSuccess(), "The sale transaction before the credit did not succeed.") />
 		
 		<cfset money.setCents(1001) />
 		
 		<cfset response = gw.credit(money = money, transactionid = response.getTransactionID(), options = options) />
+		<cfset debug(response.getMemento()) />
 		<cfset assertFalse(response.getSuccess(), "You should not be able to credit this sale transaction for a partial (greater than) amount, but this one worked.") />
 	</cffunction>
 	
@@ -217,7 +219,7 @@
 		<cfset account.setYear(year(now())+1) />
 		<cfset account.setVerificationValue(999) />
 		<cfset account.setFirstName("John") />
-		<cfset account.setLastName("DoeValidCard") />
+		<cfset account.setLastName("Doe") />
 		<cfset account.setAddress("888") />
 		<cfset account.setPostalCode("11111") />
 		<cfset account.setCountry("USA") />
@@ -235,7 +237,7 @@
 		<cfset account.setYear(year(now())+1) />
 		<cfset account.setVerificationValue(123) />
 		<cfset account.setFirstName("John") />
-		<cfset account.setLastName("DoeInvalidCard") />
+		<cfset account.setLastName("Doe") />
 		<cfset account.setAddress("236 N. Santa Cruz") />
 		<cfset account.setPostalCode("95030") />
 		<cfset account.setCountry("USA") />

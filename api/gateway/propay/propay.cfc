@@ -400,6 +400,11 @@
 		<cfswitch expression="#lcase(listLast(getMetaData(arguments.account).fullname, "."))#">
 			<cfcase value="creditcard">
 				<!---// transType for this is always 04 //--->
+
+				<cfif len(arguments.account.getYear()) eq 4>
+					<cfset arguments.account.setYear(right(arguments.account.getYear(),2)) />
+				</cfif>
+
 				<cfoutput>
 					<cfxml variable="xmlRequest">
 						<?xml version='1.0'?> 
@@ -409,7 +414,7 @@
 							<class>partner</class>
 							<XMLTrans> 
 								<transType>04</transType> 
-								<amount>#arguments.money.getAmount()#</amount> 
+								<amount>#arguments.money.getCents()#</amount> 
 								<addr>#xmlFormat(arguments.account.getAddress())#</addr> 
 								<zip>#xmlFormat(arguments.account.getPostalCode())#</zip> 
 								<accountNum>#getUsername()#</accountNum> 
@@ -434,7 +439,7 @@
 							<class>partner</class>
 							<XMLTrans> 
 								<transType>36</transType> 
-								<amount>#arguments.money.getAmount()#</amount> 
+								<amount>#arguments.money.getCents()#</amount> 
 								<accountNum>#getUsername()#</accountNum>
 								<RoutingNumber>#xmlformat(arguments.account.getRoutingNumber())#</RoutingNumber> 
 								<AccountNumber>#xmlformat(arguments.account.getAccount())#</AccountNumber> 
@@ -463,11 +468,15 @@
 		<cfset var xmlRequest = "" />
 		<cfset var invoiceNumber = "" />
 
+		<!---// transType for this is always 05 //--->
+
 		<cfif structkeyexists(arguments.options, "invoiceNumber")>
 			<cfset invoiceNumber = arguments.options["invoiceNumber"] />
 		</cfif>
 
-		<!---// transType for this is always 05 //--->
+		<cfif len(arguments.account.getYear()) eq 4>
+			<cfset arguments.account.setYear(right(arguments.account.getYear(),2)) />
+		</cfif>
 
 		<cfoutput>
 			<cfxml variable="xmlRequest">
@@ -478,7 +487,7 @@
 					<class>partner</class>
 					<XMLTrans> 
 						<transType>05</transType> 
-						<amount>#arguments.money.getAmount()#</amount> 
+						<amount>#arguments.money.getCents()#</amount> 
 						<accountNum>#getUsername()#</accountNum> 
 						<ccNum>#arguments.account.getAccount()#</ccNum> 
 						<expDate>#arguments.account.getMonth()##arguments.account.getYear()#</expDate> 
@@ -499,6 +508,10 @@
 
 		<cfset var xmlRequest = "" />
 
+		<cfif structkeyexists(arguments.options, "invoiceNumber")>
+			<cfset invoiceNumber = arguments.options["invoiceNumber"] />
+		</cfif>
+
 		<cfoutput>
 			<cfxml variable="xmlRequest">
 				<?xml version='1.0'?> 
@@ -509,7 +522,8 @@
 					<XMLTrans> 
 						<transType>06</transType> 
 						<accountNum>#getUsername()#</accountNum> 
-						<transNum>#xmlformat(arguments.authorization)#</transNum> 
+						<transNum>#xmlformat(arguments.authorization)#</transNum>
+						<invNum>#invoiceNumber#</invNum>
 					</XMLTrans>
 				</XMLRequest>
 			</cfxml>
@@ -519,6 +533,7 @@
 	</cffunction>
 	
 	<cffunction name="void" output="false" access="public" returntype="any" hint="Void Credit Card Authorization">
+		<cfargument name="money" type="any" required="true" />
 		<cfargument name="id" type="any" required="true" />
 		<cfargument name="options" type="struct" required="false" default="#structNew()#" />
 
@@ -542,7 +557,7 @@
 						<transType>07</transType> 
 						<accountNum>#getUsername()#</accountNum> 
 						<transNum>#xmlformat(arguments.id)#</transNum> 
-						<amount>#arguments.money.getAmount()#</amount> 
+						<amount>#arguments.money.getCents()#</amount> 
 						<invNum>#invoiceNumber#</invNum> 
 					</XMLTrans>
 				</XMLRequest>
@@ -578,7 +593,7 @@
 						<transType>07</transType> 
 						<accountNum>#getUsername()#</accountNum> 
 						<transNum>#xmlformat(arguments.transactionid)#</transNum> 
-						<amount>#arguments.money.getAmount()#</amount> 
+						<amount>#arguments.money.getCents()#</amount> 
 						<invNum>#invoiceNumber#</invNum> 
 					</XMLTrans>
 				</XMLRequest>
@@ -596,6 +611,10 @@
 
 		<!---// transType for this is always 34 //--->
 
+		<cfif structkeyexists(arguments.options, "invoiceNumber")>
+			<cfset invoiceNumber = arguments.options["invoiceNumber"] />
+		</cfif>
+
 		<cfoutput>
 			<cfxml variable="xmlRequest">
 				<?xml version='1.0'?> 
@@ -611,6 +630,7 @@
 						<cfelse>
 							<transNum>#xmlformat(arguments.transactionid)#</transNum>
 						</cfif>
+						<invNum>#invoiceNumber#</invNum>
 					</XMLTrans>
 				</XMLRequest>
 			</cfxml>

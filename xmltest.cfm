@@ -154,6 +154,8 @@
 <cfscript>
 	oAdmin = createObject("component", "cfide.adminapi.base");
 
+	oAdmin.dump(getDirectoryFromPath( getCurrentTemplatePath() ));
+
 	str1 = '<?xml version="1.0" encoding="utf-8" standalone="no"?> 
 					<XMLResponse xmlns:xsi="http://www.w3.org/2000/10/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.propay.com/schema/PPResponse.xsd">
 						<XMLTrans> 
