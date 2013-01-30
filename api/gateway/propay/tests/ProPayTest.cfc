@@ -26,14 +26,15 @@
 	</cffunction>
 	
 	<cffunction name="testPurchase" access="public" returntype="void" output="false">
+		<!--- Minimum amount must be 100 (one dollar) --->
 		<cfset var money = variables.svc.createMoney(100) /><!--- in cents, $1.00 --->
 		<cfset var response = "" />
 		<cfset var options = {} />
 		
-		<cfset options["email"] = "jason@example.com" />
+		<cfset options["email"] = "jason@events-registration.com" />
 		<cfset options["cardType"] = "visa" />
-		<cfset options["comments"] = "This purchase was made for Some Event." />
-		<cfset options["description"] = "Registration for Some Event" />
+		<cfset options["comments"] = "This purchase was a test from E-vents Registration." />
+		<cfset options["description"] = "Test purchase from E-vents Registration." />
 		
 		<!---// gateway should allow valid card number //--->
 		<cfset response = gw.purchase(money = money, account = createValidCard(), options = options) />
@@ -52,14 +53,15 @@
 	</cffunction>
 	
 	<cffunction name="testAuthorize" access="public" returntype="void" output="false">
+		<!--- Minimum amount must be 100 (one dollar) --->
 		<cfset var money = variables.svc.createMoney(5000) /><!--- in cents, $50.00 --->
 		<cfset var response = "" />
 		<cfset var options = {} />
 		
-		<cfset options["email"] = "jason@example.com" />
+		<cfset options["email"] = "jason@events-registration.com" />
 		<cfset options["cardType"] = "visa" />
-		<cfset options["comments"] = "This authorization was made for Some Event." />
-		<cfset options["description"] = "Registration for Some Event" />
+		<cfset options["comments"] = "This authorization was a test from E-vents Registration." />
+		<cfset options["description"] = "Test authorization from E-vents Registration." />
 		
 		<!---// test the authorize method(s) //--->
 		<cfset response = gw.authorize(money = money, account = createValidCard(), options = options) />
@@ -72,15 +74,16 @@
 	</cffunction> 
 	
 	<cffunction name="testCapture" access="public" returntype="void" output="false">
+		<!--- Minimum amount must be 100 (one dollar) --->
 		<cfset var money = variables.svc.createMoney(5000) /><!--- in cents, $50.00 --->
 		<cfset var response = "" />
 		<cfset var options = {} />
 		<cfset var transactionId = "" />
 		
-		<cfset options["email"] = "jason@example.com" />
+		<cfset options["email"] = "jason@events-registration.com" />
 		<cfset options["cardType"] = "visa" />
-		<cfset options["comments"] = "This authorization was made for Some Event." />
-		<cfset options["description"] = "Registration for Some Event" />
+		<cfset options["comments"] = "This capture was a test from E-vents Registration." />
+		<cfset options["description"] = "Test capture from E-vents Registration." />
 		
 		<cfset response = gw.authorize(money = money, account = createValidCard(), options = options) />
 		<cfset assertTrue(response.getSuccess(), "The authorization before the capture did not succeed.") />
@@ -91,15 +94,16 @@
 	</cffunction> 
 	
 	<cffunction name="testVoid" access="public" returntype="void" output="false">
+		<!--- Minimum amount must be 100 (one dollar) --->
 		<cfset var money = variables.svc.createMoney(5000) /><!--- in cents, $50.00 --->
 		<cfset var response = "" />
 		<cfset var options = {} />
 		<cfset var transactionId = "Vxxxx" />
 		
-		<cfset options["email"] = "jason@example.com" />
+		<cfset options["email"] = "jason@events-registration.com" />
 		<cfset options["cardType"] = "visa" />
-		<cfset options["comments"] = "This authorization was made for Some Event." />
-		<cfset options["description"] = "Registration for Some Event" />
+		<cfset options["comments"] = "This void was a test from E-vents Registration." />
+		<cfset options["description"] = "Test void from E-vents Registration." />
 		
 		<!---// voiding an auth-only transaction //--->
 		<cfset response = gw.authorize(money = money, account = createValidCard(), options = options) />
@@ -120,19 +124,20 @@
 		<!---// void a non-existent transaction //--->
 		<cfset response.setTransactionID("VZZZZZZZZZZZZ") />
 		<cfset response = gw.void(id = response.getTransactionID(), options = options) />
-		<cfset assertFalse(response.getSuccess(), "The void was approved, but it should not exist and return an approval code of 2.") />
+		<cfset assertFalse(response.getSuccess(), "The void was approved, but it should not exist.") />
 	</cffunction> 
 	
 	<cffunction name="testStatus" access="public" returntype="void" output="false">
+		<!--- Called "Transaction Lookup" by ProPay --->
 		<cfset var money = variables.svc.createMoney(1000) /><!--- in cents, $10.00 --->
 		<cfset var response = "" />
 		<cfset var options = {} />
 		<cfset var transactionId = "" />
 		
-		<cfset options["email"] = "jason@example.com" />
+		<cfset options["email"] = "jason@events-registration.com" />
 		<cfset options["cardType"] = "visa" />
-		<cfset options["comments"] = "This authorization was made for Some Event." />
-		<cfset options["description"] = "Registration for Some Event" />
+		<cfset options["comments"] = "Test status from E-vents Registration." />
+		<cfset options["description"] = "Transaction status from E-vents Registration." />
 		
 		<!---// getting status for an auth-only transaction //--->
 		<cfset response = gw.authorize(money = money, account = createValidCard(), options = options) />
@@ -163,10 +168,10 @@
 		<cfset var options = {} />
 		<cfset var transactionId = "" />
 		
-		<cfset options["email"] = "jason@example.com" />
+		<cfset options["email"] = "jason@events-registration.com" />
 		<cfset options["cardType"] = "visa" />
-		<cfset options["comments"] = "This authorization was made for Some Event." />
-		<cfset options["description"] = "Registration for Some Event" />
+		<cfset options["comments"] = "Test credit from E-vents Registration." />
+		<cfset options["description"] = "Testing credit from E-vents Registration" />
 		
 		<!---// crediting a valid sale transaction //--->
 		<cfset response = gw.purchase(money = money, account = createValidCard(), options = options) />
@@ -207,12 +212,12 @@
 	<cffunction name="createValidCard" access="private" returntype="any" output="false">
 		<!--- these values simulate a valid card with matching avs/cvv --->
 		<cfset var account = variables.svc.createCreditCard() />
-		<cfset account.setAccount(4111111111111111) />
+		<cfset account.setAccount(4747474747474747) />
 		<cfset account.setMonth(12) />
 		<cfset account.setYear(year(now())+1) />
 		<cfset account.setVerificationValue(999) />
 		<cfset account.setFirstName("John") />
-		<cfset account.setLastName("Doe") />
+		<cfset account.setLastName("DoeValidCard") />
 		<cfset account.setAddress("888") />
 		<cfset account.setPostalCode("11111") />
 		<cfset account.setCountry("USA") />
@@ -225,12 +230,12 @@
 	<cffunction name="createInvalidCard" access="private" returntype="any" output="false">
 		<!--- these values simulate a valid card with matching avs/cvv --->
 		<cfset var account = variables.svc.createCreditCard() />
-		<cfset account.setAccount(4100000000000000) />
+		<cfset account.setAccount(4404040404040404) />
 		<cfset account.setMonth(10) />
 		<cfset account.setYear(year(now())+1) />
 		<cfset account.setVerificationValue(123) />
 		<cfset account.setFirstName("John") />
-		<cfset account.setLastName("Doe") />
+		<cfset account.setLastName("DoeInvalidCard") />
 		<cfset account.setAddress("236 N. Santa Cruz") />
 		<cfset account.setPostalCode("95030") />
 		<cfset account.setCountry("USA") />
@@ -243,7 +248,7 @@
 	<cffunction name="createCardForErrorResponse" access="private" returntype="any" output="false">
 		<!--- these values simulate a valid card with matching avs/cvv --->
 		<cfset var account = variables.svc.createCreditCard() />
-		<cfset account.setAccount(4222222222222) />
+		<cfset account.setAccount(5454545454545454) />
 		<cfset account.setMonth(10) />
 		<cfset account.setYear(year(now())+1) />
 		<cfset account.setVerificationValue(999) />
@@ -261,7 +266,7 @@
 	<cffunction name="createValidCardWithoutCVV" access="private" returntype="any" output="false">
 		<!--- these values simulate a valid card with matching avs/cvv --->
 		<cfset var account = variables.svc.createCreditCard() />
-		<cfset account.setAccount(4111111111111111) />
+		<cfset account.setAccount(4747474747474747) />
 		<cfset account.setMonth(10) />
 		<cfset account.setYear(year(now())+1) />
 		<cfset account.setVerificationValue() />
@@ -279,7 +284,7 @@
 	<cffunction name="createValidCardWithBadCVV" access="private" returntype="any" output="false">
 		<!--- these values simulate a valid card with matching avs/cvv --->
 		<cfset var account = variables.svc.createCreditCard() />
-		<cfset account.setAccount(4111111111111111) />
+		<cfset account.setAccount(4747474747474747) />
 		<cfset account.setMonth(10) />
 		<cfset account.setYear(year(now())+1) />
 		<cfset account.setVerificationValue(1111) />
@@ -297,7 +302,7 @@
 	<cffunction name="createValidCardWithoutStreetMatch" access="private" returntype="any" output="false">
 		<!--- these values simulate a valid card with matching avs/cvv --->
 		<cfset var account = variables.svc.createCreditCard() />
-		<cfset account.setAccount(4111111111111111) />
+		<cfset account.setAccount(4747474747474747) />
 		<cfset account.setMonth(10) />
 		<cfset account.setYear(year(now())+1) />
 		<cfset account.setVerificationValue() />
@@ -315,7 +320,7 @@
 	<cffunction name="createValidCardWithoutZipMatch" access="private" returntype="any" output="false">
 		<!--- these values simulate a valid card with matching avs/cvv --->
 		<cfset var account = variables.svc.createCreditCard() />
-		<cfset account.setAccount(4111111111111111) />
+		<cfset account.setAccount(4747474747474747) />
 		<cfset account.setMonth(10) />
 		<cfset account.setYear(year(now())+1) />
 		<cfset account.setVerificationValue() />
