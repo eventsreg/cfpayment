@@ -17,8 +17,8 @@
 			variables.svc = createObject("component", "cfpayment.api.core");
 			
 			gw.path = "fts-pps.fts-pps";
-			gw.MerchantAccount = ""; // Insert your developer or production merchant account number here.
-			gw.Username = ""; // Insert your developer or production username here.
+			gw.MerchantAccount = "testing123"; // x_tran_key
+			gw.Username = "003200031999"; // x_login
 			gw.TestMode = true; // defaults to true
 
 			// create gw and get reference			
