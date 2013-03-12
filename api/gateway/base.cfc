@@ -28,17 +28,17 @@
 	Check the docs for a complete list of normalized cfpayment parameter names.
 	--->
 
-	<cfset variables.cfpayment = structNew() />
+	<cfset variables.cfpayment = {} />
 	<cfset variables.cfpayment.GATEWAYID = "1" />
 	<cfset variables.cfpayment.GATEWAY_NAME = "Base Gateway" />
 	<cfset variables.cfpayment.GATEWAY_VERSION = "1.0" />
 	<cfset variables.cfpayment.GATEWAY_TEST_URL = "http://localhost/" />
 	<cfset variables.cfpayment.GATEWAY_LIVE_URL = "http://localhost/" />
-	<cfset variables.cfpayment.PERIODICITY_MAP = StructNew() />
+	<cfset variables.cfpayment.PERIODICITY_MAP = {} />
 	<cfset variables.cfpayment.MerchantAccount = "" />
 	<cfset variables.cfpayment.Username = "" />
 	<cfset variables.cfpayment.Password = "" />
-	<cfset variables.cfpayment.Timeout = 300 />
+	<cfset variables.cfpayment.Timeout = 600 />
 	<cfset variables.cfpayment.TestMode = true />
 	
 	
@@ -176,7 +176,7 @@
 
 	<!--- the current request timeout allows us to intelligently modify the overall page timeout based 
 		  upon whatever the current page context or configured timeout dictate.  It's possible to have
-		  acces to internal Java components disabled so we take that into account here. --->
+		  accesa to internal Java components disabled so we take that into account here. --->
 	<cffunction name="getCurrentRequestTimeout" output="false" access="private" returntype="numeric">
 		<cfif variables.rcMonitorEnabled>
 			<cfreturn variables.rcMonitor.getRequestTimeout() />

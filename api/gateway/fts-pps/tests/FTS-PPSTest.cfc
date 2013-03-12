@@ -36,14 +36,13 @@
 		
 		<!--- test the purchase method --->
 		<cfset response = gw.purchase(money = money, account = createValidCard(), options = options) />
-		<!---<cfset debug(response.getMemento()) />--->
+		<cfset debug(response.getMemento()) />
 		<cfset debug("AVSMessage: #response.getAVSMessage()#") />
 		<cfset assertTrue(response.getSuccess(), "The purchase failed (1)") />
 
 		<!--- this will be rejected by gateway because the card number is not valid --->
 		<cfset response = gw.purchase(money = money, account = createInvalidCard(), options = options) />
 		<cfset assertTrue(NOT response.getSuccess(), "The authorization did succeed (3)") />
-
 
 		<cfset response = gw.purchase(money = variables.svc.createMoney(5010), account = createValidCardWithoutCVV(), options = options) />
 		<cfset assertTrue(response.getSuccess(), "The authorization did not succeed (4)") />
@@ -170,7 +169,6 @@
 
 	</cffunction>
 
-
 	<cffunction name="testAuthorizeThenVoid" access="public" returntype="void" output="false">
 	
 		<cfset var account = createValidCard() />
@@ -190,7 +188,6 @@
 		<cfset assertTrue(response.getSuccess(), "You can void a preauth") />
 
 	</cffunction>
-	
 	
 	<cffunction name="testPurchaseThenCredit" access="public" returntype="void" output="false">
 	
@@ -215,7 +212,6 @@
 
 	</cffunction>
 	
-
 	<cffunction name="testPurchaseThenVoid" access="public" returntype="void" output="false">
 	
 		<cfset var account = createValidCard() />
@@ -237,7 +233,7 @@
 	</cffunction>	
 
 
-
+	<!--- helper methods for creating test cards --->
 
 	<cffunction name="createValidCard" access="private" returntype="any" output="false">
 		<!--- these values simulate a valid card with matching avs/cvv --->
@@ -248,11 +244,13 @@
 		<cfset account.setVerificationValue(999) />
 		<cfset account.setFirstName("John") />
 		<cfset account.setLastName("Doe") />
-		<cfset account.setAddress("888") />
-		<cfset account.setPostalCode("77777") />
+		<cfset account.setAddress("661 Whispering Hills Rd") />
+		<cfset account.setPostalCode("32344") />
+		<cfset account.setCountry("US") />
 
 		<cfreturn account />	
 	</cffunction>
+	
 	<cffunction name="createCardForErrorResponse" access="private" returntype="any" output="false">
 		<!--- these values simulate a valid card with matching avs/cvv --->
 		<cfset var account = variables.svc.createCreditCard() />
@@ -264,6 +262,7 @@
 		<cfset account.setLastName("Doe") />
 		<cfset account.setAddress("888") />
 		<cfset account.setPostalCode("77777") />
+		<cfset account.setCountry("US") />
 
 		<cfreturn account />	
 	</cffunction>
@@ -279,6 +278,7 @@
 		<cfset account.setLastName("Doe") />
 		<cfset account.setAddress("236 N. Santa Cruz") />
 		<cfset account.setPostalCode("95030") />
+		<cfset account.setCountry("US") />
 
 		<cfreturn account />	
 	</cffunction>
@@ -292,8 +292,9 @@
 		<cfset account.setVerificationValue() />
 		<cfset account.setFirstName("John") />
 		<cfset account.setLastName("Doe") />
-		<cfset account.setAddress("888") />
-		<cfset account.setPostalCode("77777") />
+		<cfset account.setAddress("661 Whispering Hills Rd") />
+		<cfset account.setPostalCode("32344") />
+		<cfset account.setCountry("US") />
 
 		<cfreturn account />	
 	</cffunction>
@@ -307,8 +308,9 @@
 		<cfset account.setVerificationValue(111) />
 		<cfset account.setFirstName("John") />
 		<cfset account.setLastName("Doe") />
-		<cfset account.setAddress("888") />
-		<cfset account.setPostalCode("77777") />
+		<cfset account.setAddress("661 Whispering Hills Rd") />
+		<cfset account.setPostalCode("32344") />
+		<cfset account.setCountry("US") />
 
 		<cfreturn account />	
 	</cffunction>
@@ -322,8 +324,9 @@
 		<cfset account.setVerificationValue() />
 		<cfset account.setFirstName("John") />
 		<cfset account.setLastName("Doe") />
-		<cfset account.setAddress("N. Santa Cruz") />
+		<cfset account.setAddress("") />
 		<cfset account.setPostalCode("77777") />
+		<cfset account.setCountry("US") />
 
 		<cfreturn account />	
 	</cffunction>
@@ -337,8 +340,9 @@
 		<cfset account.setVerificationValue() />
 		<cfset account.setFirstName("John") />
 		<cfset account.setLastName("Doe") />
-		<cfset account.setAddress("888") />
+		<cfset account.setAddress("661 Whispering Hills Rd") />
 		<cfset account.setPostalCode("00000") />
+		<cfset account.setCountry("US") />
 
 		<cfreturn account />	
 	</cffunction>
@@ -353,6 +357,7 @@
 		<cfset account.setAddress("236 N. Santa Cruz Ave") />
 		<cfset account.setPostalCode("95030") />
 		<cfset account.setPhoneNumber("415-555-1212") />
+		<cfset account.setCountry("US") />
 		
 		<cfset account.setAccountType("checking") />
 

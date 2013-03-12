@@ -86,7 +86,9 @@
 		
 			// Translate to Authorize.net specific name.
 			if (structKeyExists(arguments.options, "orderID"))
+			{
 				structInsert(p, "x_invoice_num", arguments.options.orderID, "yes");
+			}
 		
 			// Configure the gateway environment variables.
 			structInsert(p, "x_version", variables.cfpayment.GATEWAY_VERSION, "yes");
@@ -105,16 +107,15 @@
 			// The first is a developer account. The second is test mode where you can use "test" account numbers, etc. Both developer and production accounts can be set to test mode.
 			// However, if set to TRUE here, you can't do any follow-on trans like CAPTURE or VOID because x_trans_id is always 0
 			// But, if set to FALSE, you can't test AVS failures.
+			
 			if (not structKeyExists(p, "x_test_request"))
 			{
 				structInsert(p, "x_test_request", "FALSE", "yes"); 
 			}
 
-
 			// send it over the wire using the base gateway's transport function.
 			response = createResponse(argumentCollection = super.process(payload = p));
 
-			
 			// do some meta-checks for gateway-level errors (as opposed to auth/decline errors)
 			if (not response.hasError()) {
 		
@@ -168,13 +169,13 @@
 			}
 
 			if (response.getStatus() eq getService().getStatusSuccessful()) {
-				if (results.x_type EQ "auth_only")
+				if (results.x_type == "auth_only")
 					structInsert(results, "result", "APPROVED", "yes");
 				else
 					structInsert(results, "result", "CAPTURED", "yes");
 			}
 			else if (response.getStatus() eq getService().getStatusDeclined()) {
-				if (results.x_type EQ "auth_only")
+				if (results.x_type == "auth_only")
 					structInsert(results, "result", "NOT APPROVED", "yes");
 				else
 					structInsert(results, "result", "NOT CAPTURED", "yes");
