@@ -45,6 +45,9 @@
 		<cfset var response = "" />
 		<cfset var options = structNew() />
 		<cfset options.orderid = getTickCount() /><!---Authorize.net requires a unique order id for each transaction.--->
+			
+		<cfset options["description"] = "Regisration test on Authorize.net!!" />
+		<cfset options["customerId"] = "1111111" />
 		
 		<!--- test the purchase method --->
 		<cfset response = gw.purchase(money = money, account = createValidCard(), options = options) />

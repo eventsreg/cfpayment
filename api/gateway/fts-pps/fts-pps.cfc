@@ -71,7 +71,9 @@
 				x_email:			Customer's e-mail address
 				x_email_customer:	Customer's email address
 				x_customer_ip:		Customer's IP address
-				x_cust_id:			unique customer id
+				x_invoice_num:		unique invoice number
+				x_cust_id:			(Up to 20 characters (no symbols)) unique customer id
+				x_description: 		(Up to 255 (no symbols) The description must be created dynamically on the merchant server or provided on a per-transaction basis. The payment gateway does not perform this function.
 		--->
 		<cfscript>
 			var response = "";
@@ -88,6 +90,16 @@
 			if (structKeyExists(arguments.options, "orderID"))
 			{
 				structInsert(p, "x_invoice_num", arguments.options.orderID, "yes");
+			}
+			
+			if ( structkeyexists(arguments.options, "description") && len(arguments.options["description"]))
+			{
+				structInsert(p, "x_description", rereplace(left(arguments.options["description"],255),"[^a-zA-Z0-9 \.]","","all"), "yes");
+			}
+
+			if ( structkeyexists(arguments.options, "customerId") && len(arguments.options["customerId"]))
+			{
+				structInsert(p, "x_cust_id", rereplace(left(arguments.options["customerId"],255),"[^a-zA-Z0-9 \.]","","all"), "yes");
 			}
 		
 			// Configure the gateway environment variables.

@@ -98,12 +98,12 @@
 
 			if ( structkeyexists(arguments.options, "description") && len(arguments.options["description"]))
 			{
-				structInsert(p, "x_description", rereplace(left(arguments.options["description"],255),"[^a-zA-Z0-9 ]","all"), "yes");
+				structInsert(p, "x_description", rereplace(left(arguments.options["description"],255),"[^a-zA-Z0-9 \.]","","all"), "yes");
 			}
 
 			if ( structkeyexists(arguments.options, "customerId") && len(arguments.options["customerId"]))
 			{
-				structInsert(p, "x_cust_id", rereplace(left(arguments.options["customerId"],255),"[^a-zA-Z0-9 ]","all"), "yes");
+				structInsert(p, "x_cust_id", rereplace(left(arguments.options["customerId"],255),"[^a-zA-Z0-9 \.]","","all"), "yes");
 			}
 		
 			// Configure the gateway environment variables.
