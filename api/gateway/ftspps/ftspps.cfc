@@ -1,31 +1,13 @@
-<!---
-
-	Copyright 20013 Jason Brookins: jason@events-registration.com
-
-	API:  http://www.ftservice.com/developers.php#!api
-	
-	Licensed under the Apache License, Version 2.0 (the "License"); you 
-	may not use this file except in compliance with the License. You may 
-	obtain a copy of the License at:
-	 
-		http://www.apache.org/licenses/LICENSE-2.0
-		 
-	Unless required by applicable law or agreed to in writing, software 
-	distributed under the License is distributed on an "AS IS" BASIS, 
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-	See the License for the specific language governing permissions and 
-	limitations under the License.
---->
 <cfcomponent displayname="FTS/PPS Authorize.net Emulator" extends="cfpayment.api.gateway.base" hint="FTS/PPS Authorize.net Emulator" output="false">
 	<cfscript>
-		variables.cfpayment.GATEWAY_NAME = "FTS/PPS";
+		variables.cfpayment.GATEWAY_NAME = "FTSPPS";
 		variables.cfpayment.GATEWAY_VERSION = "3.1";
 		variables.cfpayment.GATEWAY_TEST_URL = "https://demo.prinpay.com:6443/cardconnect/znet";
-		variables.cfpayment.GATEWAY_LIVE_URL = "https://demo.prinpay.com:6443/cardconnect/znet";
+		variables.cfpayment.GATEWAY_LIVE_URL = "https://fts.prinpay.com:6443/cardconnect/znet";
 		variables.cfpayment.GATEWAY_responseDelimeter = "|"; // For x_delim_char - Any valid character overrides merchant interface setting if defined.		
 		
-		structInsert(variables, "ftspps", structNew());
-		structInsert(variables.ftspps, "respReasonCodes", structNew());
+		structInsert(variables, "structFtspps", structNew());
+		structInsert(variables.structFtspps, "respReasonCodes", structNew());
 		
 		addResponseReasonCodes(); // Sets up the response code lookup struct.		
 	</cfscript>
@@ -90,6 +72,10 @@
 			if (structKeyExists(arguments.options, "orderID"))
 			{
 				structInsert(p, "x_invoice_num", arguments.options.orderID, "yes");
+			}
+			else
+			{
+				structInsert(p, "x_invoice_num", createuuid(), "yes");
 			}
 			
 			if ( structkeyexists(arguments.options, "description") && len(arguments.options["description"]))
@@ -537,16 +523,16 @@
 			structInsert(resp, "respReasonText", arguments.respReasonText);
 			structInsert(resp, "notes", arguments.notes);
 
-			structInsert(variables.ftspps.respReasonCodes, arguments.respReasonCode, resp, "no");
+			structInsert(variables.structFtspps.respReasonCodes, arguments.respReasonCode, resp, "no");
 			
-			return variables.ftspps.respReasonCodes;
+			return variables.structFtspps.respReasonCodes;
 		}
 		
 		function getResponseReasonCode(respReasonCode) {
 			var resp = {};
 
-			if (structKeyExists(variables.ftspps.respReasonCodes, arguments.respReasonCode)) {
-				resp = variables.ftspps.respReasonCodes[arguments.respReasonCode];
+			if (structKeyExists(variables.structFtspps.respReasonCodes, arguments.respReasonCode)) {
+				resp = variables.structFtspps.respReasonCodes[arguments.respReasonCode];
 			}
 			else {
 				structInsert(resp, "respCode", "");

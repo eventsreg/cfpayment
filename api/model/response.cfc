@@ -141,7 +141,7 @@
 			<cfif structKeyExists(variables.cfpayment.ResponseAVS, arguments.AVSCode)>
 				<cfset variables.cfpayment.AVSCode = uCase(arguments.AVSCode) />
 			<cfelse>
-				<cfthrow message="Invalid AVS Response Code: #arguments.AVSCode#" type="cfpayment.InvalidResponse.AVS" />
+				<cfthrow message="Invalid AVS Response Code: '#arguments.AVSCode#'" type="cfpayment.InvalidResponse.AVS" />
 			</cfif>
 		</cfif>
 		
