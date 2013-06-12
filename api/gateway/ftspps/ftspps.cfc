@@ -3,7 +3,7 @@
 		variables.cfpayment.GATEWAY_NAME = "FTSPPS";
 		variables.cfpayment.GATEWAY_VERSION = "3.1";
 		variables.cfpayment.GATEWAY_TEST_URL = "https://demo.prinpay.com:6443/cardconnect/znet";
-		variables.cfpayment.GATEWAY_LIVE_URL = "https://fts.prinpay.com:6443/cardconnect/znet";
+		variables.cfpayment.GATEWAY_LIVE_URL = "https://fts.prinpay.com:8443/cardconnect/znet";
 		variables.cfpayment.GATEWAY_responseDelimeter = "|"; // For x_delim_char - Any valid character overrides merchant interface setting if defined.		
 		
 		structInsert(variables, "structFtspps", structNew());
