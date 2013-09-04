@@ -87,6 +87,11 @@
 			{
 				structInsert(p, "x_cust_id", rereplace(left(arguments.options["customerId"],255),"[^a-zA-Z0-9 \.]","","all"), "yes");
 			}
+
+			if ( structkeyexists(arguments.options, "country") )
+			{
+				structInsert(p, "x_country", rereplace(left(arguments.options["country"],255),"[^a-zA-Z0-9 \.]","","all"), "yes");
+			}
 		
 			// Configure the gateway environment variables.
 			structInsert(p, "x_version", variables.cfpayment.GATEWAY_VERSION, "yes");
