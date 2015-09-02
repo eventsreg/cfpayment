@@ -32,7 +32,7 @@
 		// The developer API link is: http://developer.authorize.net/api/reference/
 
 		/*
-			Live Url updated per this:
+			Live Url updated per this: 10/2/2015:
 			http://community.developer.authorize.net/t5/The-Authorize-Net-Developer-Blog/Important-Authorize-Net-Networking-Change/ba-p/51272?utm_campaign=2015%20Technical%20Newsletter%20to%20Affiliates.html&utm_medium=email&utm_source=Eloqua
 		
 			Excerpt:
