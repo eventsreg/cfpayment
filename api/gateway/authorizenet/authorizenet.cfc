@@ -1,5 +1,4 @@
 <!---
-
 	Copyright 2006-2009 Jonah Blossom (http://www.creori.com/)
 	
 	Based on Authorizenet.cfm custom tag by Jonah Blossom, Authorize.net 
@@ -29,8 +28,38 @@
 		
 		// The test URL requires a separate developer transKey and login
 		// Request a developer account here: http://developer.authorize.net/testaccount/
+
+		// The developer API link is: http://developer.authorize.net/api/reference/
+
+		/*
+			Live Url updated per this:
+			http://community.developer.authorize.net/t5/The-Authorize-Net-Developer-Blog/Important-Authorize-Net-Networking-Change/ba-p/51272?utm_campaign=2015%20Technical%20Newsletter%20to%20Affiliates.html&utm_medium=email&utm_source=Eloqua
+		
+			Excerpt:
+
+			The new Akamai transaction URLs that are available now are:
+ 
+			https://api2.authorize.net/xml/v1/request.api
+			https://api2.authorize.net/soap/v1/request.asmx
+			https://secure2.authorize.net/gateway/transact.dll 
+			
+			FIREWALL AND IP ADDRESS CONSIDERATIONS
+ 
+			If you do not use a firewall or do not connect directly via an IP address, then you can disregard this section.
+			Using Akamai technology, Authorize.Net’s IP addresses will become dynamic rather than static. If your website or payment solution uses a firewall 
+			that has whitelisted Authorize.Net’s IP address or connects to Authorize.Net directly via an IP address, you will need to make additional changes.
+			 
+			Firewall Considerations – If your solution uses a firewall to filter outbound connections, make sure that the firewall is set to permit outbound 
+			traffic to flow to the Akamai cloud by configuring your outbound firewall to “ANY.” If you do not update your firewall ahead of June 2016, you 
+			will be unable to process transactions after Phase Two is implemented.
+
+			IP Address Considerations – If your solution connects to Authorize.Net directly via an IP address, you will need to update it to connect by domain name. 
+			Continuing to connect directly via an IP address is strongly discouraged as merchants will not receive the benefits of routing through Akamai, and could 
+			suffer a loss of service if transactions are re-routed among our various data centers. Akamai is available for testing now in our sandbox environment. 
+			We strongly encourage you to test your solution prior to making any production change to ensure that you will not experience any disruptions to transaction processing.
+		*/
 		variables.cfpayment.GATEWAY_TEST_URL = "https://test.authorize.net/gateway/transact.dll";
-		variables.cfpayment.GATEWAY_LIVE_URL = "https://secure.authorize.net/gateway/transact.dll";
+		variables.cfpayment.GATEWAY_LIVE_URL = "https://secure2.authorize.net/gateway/transact.dll";
 		variables.cfpayment.GATEWAY_responseDelimeter = "|"; // For x_delim_char - Any valid character overrides merchant interface setting if defined.		
 		
 		structInsert(variables, "authorizenet", structNew());
