@@ -527,7 +527,7 @@
 	<!---//
 	$Id: payflowpro.cfc 000 2012-06-13 02:24:23Z jasonb $
 	
-	Copyright 2012 Jason Brookins (http://www.jasonbrookins.com/)
+	Copyright 2012-2015 Jason Brookins (http://www.jasonbrookins.com/)
 		
 	Licensed under the Apache License, Version 2.0 (the "License"); you 
 	may not use this file except in compliance with the License. You may 
@@ -543,7 +543,7 @@
 	
 	Guide: https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_PayflowPro_Guide.pdf
 	XMLPay: https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_PayflowPro_XMLPay_Guide.pdf
+	PayPal PDF: https://www.paypalobjects.com/webstatic/en_US/developer/docs/pdf/pp_payflowpro_guide.pdf
 
 	//--->
-	
 </cfcomponent>

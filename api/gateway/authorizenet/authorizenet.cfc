@@ -334,16 +334,18 @@
 			structInsert(post, "x_type", "CREDIT", "yes");
 			structInsert(post, "x_trans_id", arguments.transactionid, "yes");
 
-			switch (lcase(listLast(getMetaData(arguments.account).fullname, "."))) {
-				case "creditcard": {
-					// copy in name and customer details
-					post = addCustomer(post = post, account = arguments.account, options = arguments.options);
-					post = addCreditCard(post = post, account = arguments.account, options = arguments.options);
-					break;
-				}
-				default: {
-					throw("The account type #lcase(listLast(getMetaData(arguments.account).fullname, "."))# is not supported by this gateway.", "", "cfpayment.InvalidAccount");
-					break;
+			if ( arguments.keyExists("account") ) {
+				switch (lcase(listLast(getMetaData(arguments.account).fullname, "."))) {
+					case "creditcard": {
+						// copy in name and customer details
+						post = addCustomer(post = post, account = arguments.account, options = arguments.options);
+						post = addCreditCard(post = post, account = arguments.account, options = arguments.options);
+						break;
+					}
+					default: {
+						throw("The account type #lcase(listLast(getMetaData(arguments.account).fullname, "."))# is not supported by this gateway.", "", "cfpayment.InvalidAccount");
+						break;
+					}
 				}
 			}
 
