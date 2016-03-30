@@ -342,10 +342,6 @@
 						post = addCreditCard(post = post, account = arguments.account, options = arguments.options);
 						break;
 					}
-					default: {
-						throw("The account type #lcase(listLast(getMetaData(arguments.account).fullname, "."))# is not supported by this gateway.", "", "cfpayment.InvalidAccount");
-						break;
-					}
 				}
 			}
 
