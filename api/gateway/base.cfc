@@ -306,6 +306,13 @@
 			<cfthrow message="Invalid Method" type="cfpayment.InvalidParameter.Method" />
 		</cfif>
 
+		<cfscript>
+			logMethodsPath = expandpath("CFHTTP_Methods.results");
+			fileOpen(logMethodsPath, "append");
+			fileWriteLine(logMethodsFile,"{ method: ""#arguments.method#"", url: ""#arguments.url#"" },");
+			fileClose(logMethodsFile);
+		</cfscript>
+
 		<!--- send request --->
 		<cfhttp url="#arguments.url#" method="#arguments.method#" timeout="#arguments.timeout#" throwonerror="no">
 			<!--- pass along any extra headers, like Accept or Authorization or Content-Type --->
