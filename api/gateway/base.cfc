@@ -207,7 +207,7 @@
 												,GATEWAY_URL = getGatewayURL(argumentCollection = arguments)
 												,HTTP_METHOD = arguments.method
 												} />
-		</cfif>									
+		</cfif>
 
 		<!--- enable a little extra time past the CFHTTP timeout so error handlers can run --->
 		<cfsetting requesttimeout="#max(getCurrentRequestTimeout(), getTimeout() + 10)#" />
@@ -277,7 +277,6 @@
 
 		<!--- return raw collection to be handled by gateway-specific code --->
 		<cfreturn ResponseData />
-
 	</cffunction>
 
 	<!--- ------------------------------------------------------------------------------
@@ -287,7 +286,7 @@
 		  ------------------------------------------------------------------------- --->
 	<cffunction name="doHttpCall" access="private" hint="wrapper around the http call - improves testing" returntype="struct" output="false">
 		<cfargument name="url" type="string" required="true" hint="URL to get/post" />
-		<cfargument name="method" type="string" required="false" hint="the http request method. use 'get' or 'post'" default="get" />
+		<cfargument name="method" type="string" required="false" hint="the http request method. use 'get' or 'post'" default="post" />
 		<cfargument name="timeout" type="numeric" required="true" />
 		<cfargument name="headers" type="struct" required="false" default="#structNew()#" />
 		<cfargument name="payload" type="any" required="false" default="#structNew()#" />
@@ -298,20 +297,44 @@
 		<cfset var skey = "" />
 		<cfset var paramType = "" />
 
-		<cfif ucase(arguments.method) EQ "GET">
+		<cfif ucase(arguments.method) eq "GET">
 			<cfset paramType = "url" />
-		<cfelseif ucase(arguments.method) EQ "POST">
+		<cfelseif ucase(arguments.method) eq "POST">
 			<cfset paramType = "formfield" />
 		<cfelse>
 			<cfthrow message="Invalid Method" type="cfpayment.InvalidParameter.Method" />
 		</cfif>
 
-		<cfscript>
-			logMethodsPath = expandpath("CFHTTP_Methods.results");
-			fileOpen(logMethodsPath, "append");
-			fileWriteLine(logMethodsFile,"{ method: ""#arguments.method#"", url: ""#arguments.url#"" },");
-			fileClose(logMethodsFile);
-		</cfscript>
+
+
+
+
+
+
+		<!--- <cfscript>
+            fileUtils = createObject("java", "org.apache.commons.io.FileUtils");
+            charSet = createObject("java", "java.nio.charset.Charset");
+
+            try {
+            	file = createObject("java", "java.io.File").init(javaCast("string", "C:\inetpub\wwwroot\CFHTTP_Verbs.txt"));
+                fileUtils.writeStringToFile(file, "{ date: '#dateformat(now(),"m/d/yyyy")#', function: 'doHttpCall()', verb: '#arguments.method#', url: '#arguments.url#' }#NewLine( )#", charSet.forName("utf-8"), true);
+            } catch (Any e) {
+                // silently fail so as to not interrupt transaction processing
+                mail = new mail();
+
+                mail.setSubject("CFPayment base.cfc: doHttpCall() log error");
+                mail.setTo("jason@events-registration.com");
+                mail.setFrom("noreply@pnmi.com");
+                mail.setReplyTo("noreply@pnmi.com");
+                mail.addPart(type = "text", charset = "utf-8", wraptext = "72", body = "#serializejson(e)#");
+                mail.addPart(type = "html", charset = "utf-8", body = "#serializejson(e)#");
+            }
+        </cfscript> --->
+
+
+
+
+
 
 		<!--- send request --->
 		<cfhttp url="#arguments.url#" method="#arguments.method#" timeout="#arguments.timeout#" throwonerror="no">
