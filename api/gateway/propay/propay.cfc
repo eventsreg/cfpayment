@@ -405,6 +405,12 @@
 					<cfset arguments.account.setYear(right(arguments.account.getYear(),2)) />
 				</cfif>
 
+				<cfif len(arguments.account.getNameOnCard()) gt 0>
+					<cfset _nameoncard = arguments.account.getNameOnCard() />
+				<cfelse>
+					<cfset _nameoncard = arguments.account.getFirstName() & " " & arguments.account.getLastName() />
+				</cfif>
+
 				<cfoutput>
 					<cfxml variable="xmlRequest">
 						<?xml version='1.0'?> 
@@ -421,7 +427,7 @@
 								<ccNum>#arguments.account.getAccount()#</ccNum> 
 								<expDate>#arguments.account.getMonth()##arguments.account.getYear()#</expDate> 
 								<CVV2>#xmlformat(arguments.account.getVerificationValue())#</CVV2> 
-								<cardholderName>#xmlformat(arguments.account.getFirstName() & " " & arguments.account.getLastName())#</cardholderName> 
+								<cardholderName>#xmlformat(_nameoncard)#</cardholderName> 
 								<invNum>#invoiceNumber#</invNum> 
 								<billPay>N</billPay> 
 							</XMLTrans>
@@ -665,9 +671,9 @@
 	</cffunction>
 	
 	<!---//
-	$Id: propay.cfc 000 2013-01-29 02:24:23Z jasonb $
+	$Id: propay.cfc 000 2016-09-29 02:24:23Z jasonb $
 	
-	Copyright 2013 Jason Brookins (http://www.jasonbrookins.com/)
+	Copyright 2016 E-vents Registration, LLC
 		
 	Licensed under the Apache License, Version 2.0 (the "License"); you 
 	may not use this file except in compliance with the License. You may 
@@ -686,5 +692,4 @@
 	Production URL is: https://epay.propay.com/api/propayapi.aspx
 
 	//--->
-	
 </cfcomponent>

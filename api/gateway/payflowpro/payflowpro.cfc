@@ -89,7 +89,7 @@
 			local.h["Content-Length"] = len(local.p);
 			local.h["X-VPS-REQUEST-ID"] = createuuid();
 			local.h["X-VPS-CLIENT-TIMEOUT"] = 45;
-			local.h["X-VPS-VIT-INTEGRATION-PRODUCT"] = "Coldfusion/CFPayment";
+			local.h["X-VPS-VIT-INTEGRATION-PRODUCT"] = "Lucee/CFPayment";
 			
 			local.processorData = createResponse(argumentCollection = super.process(payload = local.p, headers=local.h));
 			
@@ -106,9 +106,9 @@
 
 							if ( structkeyexists(transactionResult[1], "Result") and structkeyexists(variables.payflowpro,transactionResult[1].Result.xmlText) ) {
 								local.processorData.setMessage(variables.payflowpro[transactionResult[1].Result.xmlText]);
-							}else if ( structkeyexists(transactionResult[1], "Message") ) {
+							} else if ( structkeyexists(transactionResult[1], "Message") ) {
 								local.processorData.setMessage(transactionResult[1].Message.xmlText);
-							}else{
+							} else {
 								local.processorData.setMessage("No message found.");
 							}
 							
@@ -148,7 +148,6 @@
 									}
 								}
 							}
-
 						}else{
 							local.processorData.setStatus(getService().getStatusUnknown());
 							local.processorData.setMessage("Required Xml node missing from transaction response or there were too many of the necessary Xml node(s). [#arraylen(transactionResult)#]");
@@ -178,6 +177,12 @@
 		
 		<cfswitch expression="#lcase(listLast(getMetaData(arguments.account).fullname, "."))#">
 			<cfcase value="creditcard">
+				<cfif len(arguments.account.getNameOnCard()) gt 0>
+					<cfset _nameoncard = arguments.account.getNameOnCard() />
+				<cfelse>
+					<cfset _nameoncard = arguments.account.getFirstName() & " " & arguments.account.getLastName() />
+				</cfif>
+
 				<cfoutput>
 					<cfxml variable="xmlRequest">
 						<XMLPayRequest Timeout='30' version = '2.0' xmlns='http://www.paypal.com/XMLPay'>
@@ -209,7 +214,7 @@
 														<CardNum>#arguments.account.getAccount()#</CardNum>
 														<ExpDate>#arguments.account.getYear()##arguments.account.getMonth()#</ExpDate>
 														<CVNum>#xmlformat(arguments.account.getVerificationValue())#</CVNum>
-														<NameOnCard>#xmlformat(arguments.account.getFirstName() & " " & arguments.account.getLastName())#</NameOnCard>
+														<NameOnCard>#xmlformat(_nameoncard)#</NameOnCard>
 													</Card>
 												</Tender>
 											</PayData>
@@ -290,6 +295,12 @@
 
 		<cfset var xmlRequest = "" />
 
+		<cfif len(arguments.account.getNameOnCard()) gt 0>
+			<cfset _nameoncard = arguments.account.getNameOnCard() />
+		<cfelse>
+			<cfset _nameoncard = arguments.account.getFirstName() & " " & arguments.account.getLastName() />
+		</cfif>
+
 		<cfoutput>
 			<cfxml variable="xmlRequest">
 				<XMLPayRequest Timeout='30' version = '2.0' xmlns='http://www.paypal.com/XMLPay'>
@@ -321,7 +332,7 @@
 												<CardNum>#arguments.account.getAccount()#</CardNum>
 												<ExpDate>#arguments.account.getYear()##arguments.account.getMonth()#</ExpDate>
 												<CVNum>#xmlformat(arguments.account.getVerificationValue())#</CVNum>
-												<NameOnCard>#xmlformat(arguments.account.getFirstName() & " " & arguments.account.getLastName())#</NameOnCard>
+												<NameOnCard>#xmlformat(_nameoncard)#</NameOnCard>
 											</Card>
 										</Tender>
 									</PayData>
@@ -525,9 +536,9 @@
 	</cffunction>
 	
 	<!---//
-	$Id: payflowpro.cfc 000 2012-06-13 02:24:23Z jasonb $
+	$Id: payflowpro.cfc 000 2016-09-29 02:24:23Z jasonb $
 	
-	Copyright 2012-2015 Jason Brookins (http://www.jasonbrookins.com/)
+	Copyright 2012-2016 E-vents Registration / Jason Brookins
 		
 	Licensed under the Apache License, Version 2.0 (the "License"); you 
 	may not use this file except in compliance with the License. You may 
@@ -544,6 +555,5 @@
 	Guide: https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_PayflowPro_Guide.pdf
 	XMLPay: https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_PayflowPro_XMLPay_Guide.pdf
 	PayPal PDF: https://www.paypalobjects.com/webstatic/en_US/developer/docs/pdf/pp_payflowpro_guide.pdf
-
 	//--->
 </cfcomponent>

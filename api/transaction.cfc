@@ -48,7 +48,6 @@
 		<cfreturn variables.instance.core />
 	</cffunction>
 	
-
 	<!--- GATEWAY WRAPPERS FOR PERSISTENCE (only necessary for credits/debits, not lookups/etc) --->
 	<cffunction name="authorize" output="false" access="public" returntype="any" hint="Verifies payment details with merchant bank">
 		<cfargument name="amount" type="numeric" required="true" />
@@ -79,10 +78,6 @@
 	
 	--->
 
-
-
-
-
 	<!--- PRIVATE ENCRYPTION WRAPPERS --->
 	<cffunction name="hasEncryptionService" access="private" returntype="any" output="false"><cfreturn variables.instance.hasEncryptionService /></cffunction>
 	<cffunction name="getEncryptionService" access="private" returntype="any" output="false"><cfreturn variables.instance.encryptionService /></cffunction>
@@ -107,36 +102,29 @@
 		<cfset var key = "" />
 		
 		<cfif hasEncryptionService()>
-
 			<cfset data = listAppend(data, arguments.account.getFirstName(), "|") />
 			<cfset data = listAppend(data, arguments.account.getLastName(), "|") />
 			<cfset data = listAppend(data, arguments.account.getAddress(), "|") />
 			<cfset data = listAppend(data, arguments.account.getPostalCode(), "|") />
 			
 			<cfif arguments.account.getIsCreditCard()>
-
+				<cfset data = listAppend(data, arguments.account.getNameOnCard(), "|") />
 				<cfset data = listAppend(data, arguments.account.getAccount(), "|") />
 				<cfset data = listAppend(data, arguments.account.getMonth(), "|") />
 				<cfset data = listAppend(data, arguments.account.getYear(), "|") />
-
 			<cfelseif arguments.account.getIsEFT()>
-			
 				<cfset data = listAppend(data, arguments.account.getPhoneNumber(), "|") />
 				<cfset data = listAppend(data, arguments.account.getAccount(), "|") />
 				<cfset data = listAppend(data, arguments.account.getRoutingNumber(), "|") />
 				<cfset data = listAppend(data, arguments.account.getCheckNumber(), "|") />			
-			
 			</cfif>
 			
 			<!--- add random salt into encrypted data --->
 			<cfset data = listAppend(data, generateSecretKey("AES"), "|") />
-		
 			<cfreturn getEncryptionService().encryptData(data) />
-		
 		</cfif>
 	
 		<cfreturn "" />
-		
 	</cffunction>
 	<cffunction name="setEncryptedMemento" access="private" output="false" returntype="void">
 		<cfargument name="account" type="any" required="true" />
@@ -155,23 +143,16 @@
 			<cfset arguments.account.setPostalCode(listGetAt(account, 4, "|")) />
 			
 			<cfif arguments.account.getIsCreditCard()>
-
-				<cfset arguments.account.setAccount(listGetAt(account, 5, "|")) />
-				<cfset arguments.account.setMonth(listGetAt(account, 6, "|")) />
-				<cfset arguments.account.setYear(listGetAt(account, 7, "|")) />
-
+				<cfset arguments.account.setNameOnCard(listGetAt(account, 5, "|")) />
+				<cfset arguments.account.setAccount(listGetAt(account, 6, "|")) />
+				<cfset arguments.account.setMonth(listGetAt(account, 7, "|")) />
+				<cfset arguments.account.setYear(listGetAt(account, 8, "|")) />
 			<cfelseif arguments.account.getIsEFT()>
-			
 				<cfset arguments.account.setPhoneNumber(listGetAt(account, 5, "|")) />
 				<cfset arguments.account.setAccount(listGetAt(account, 6, "|")) />
 				<cfset arguments.account.setRoutingNumber(listGetAt(account, 7, "|")) />
 				<cfset arguments.account.setCheckNumber(listGetAt(account, 8, "|")) />
-
 			</cfif>
-			
 		</cfif>
-	
 	</cffunction>
-
-
 </cfcomponent>

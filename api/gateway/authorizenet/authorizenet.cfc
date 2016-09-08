@@ -93,8 +93,8 @@
 			x_card_num  -  Customer's credit card number
 			x_exp_date  -  Customer's credit card expiration date
 			x_card_code  -  Any valid CVV2, CVC2, or CID value
-			x_first_name  -  Customer's first name
-			x_last_name  -  Customer's last name
+			x_first_name  -  Customer's first name (only required for a European payment processor)
+			x_last_name  -  Customer's last name (only required for a European payment processor)
 			x_address  -  Customer's street address
 			x_city  -  City for the customer's address
 			x_state  -  State for the customer's address
@@ -125,13 +125,11 @@
 				structInsert(p, "x_invoice_num", arguments.options.orderID, "yes");
 			}
 
-			if ( structkeyexists(arguments.options, "description") && len(arguments.options["description"]))
-			{
+			if ( structkeyexists(arguments.options, "description") && len(arguments.options["description"])) {
 				structInsert(p, "x_description", rereplace(left(arguments.options["description"],255),"[^a-zA-Z0-9 \.]","","all"), "yes");
 			}
 
-			if ( structkeyexists(arguments.options, "customerId") && len(arguments.options["customerId"]))
-			{
+			if ( structkeyexists(arguments.options, "customerId") && len(arguments.options["customerId"])) {
 				structInsert(p, "x_cust_id", rereplace(left(arguments.options["customerId"],255),"[^a-zA-Z0-9 \.]","","all"), "yes");
 			}
 		
@@ -153,8 +151,7 @@
 			// The second is test mode where you can use "test" account numbers, etc. Both developer and production accounts can be set to test mode.
 			// However, if set to TRUE here, you can't do any follow-on trans like CAPTURE or VOID because x_trans_id is always 0
 			// But, if set to FALSE, you can't test AVS failures.
-			if (not structKeyExists(p, "x_test_request"))
-			{
+			if (not structKeyExists(p, "x_test_request")) {
 				structInsert(p, "x_test_request", "FALSE", "yes"); 
 			}
 
@@ -162,8 +159,7 @@
 			response = createResponse(argumentCollection = super.process(payload = p));
 			
 			// do some meta-checks for gateway-level errors (as opposed to auth/decline errors)
-			if (not response.hasError()) {
-		
+			if ( !response.hasError()) {
 				// we need to have a result; otherwise that's an error in itself
 				if (len(response.getResult())) {
 				
@@ -391,8 +387,8 @@
 		<cfargument name="options" type="struct" required="true" />	
 
 		<cfscript>
-			structInsert(arguments.post, "x_first_name", arguments.account.getFirstName()); // Customer's first name
-			structInsert(arguments.post, "x_last_name", arguments.account.getLastName()); // Customer's last name
+			structInsert(arguments.post, "x_first_name", arguments.account.getFirstName()); // Customer's first name (only required for a European payment processor)
+			structInsert(arguments.post, "x_last_name", arguments.account.getLastName()); // Customer's last name (only required for a European payment processor)
 			structInsert(arguments.post, "x_address", arguments.account.getAddress()); // Customer's street address
 			structInsert(arguments.post, "x_city", arguments.account.getCity()); // City for the customer's address
 			structInsert(arguments.post, "x_state", arguments.account.getRegion()); // State for the customer's address
@@ -631,8 +627,6 @@
 			addResponseReasonCode("2", "250", "This transaction has been declined.", "This transaction was submitted from a blocked IP address.  ");
 			addResponseReasonCode("2", "251", "This transaction has been declined.", "The transaction was declined as a result of triggering a Fraud Detection Suite filter. ");
 			addResponseReasonCode("2", "254", "Your transaction has been declined.", "The transaction was declined after manual review. ");
-			
-			
 			addResponseReasonCode("3", "5", "A valid amount is required.", "The value submitted in the amount field did not pass validation for a number. ");
 			addResponseReasonCode("3", "6", "The credit card number is invalid.", "");
 			addResponseReasonCode("3", "7", "The credit card expiration date is invalid.", "The format of the date submitted was incorrect. ");
@@ -753,8 +747,6 @@
 			addResponseReasonCode("3", "261", "An error occurred during processing. Please try again.", "The transaction experienced an error during sensitive data encryption and was not processed. Please try again. ");
 			addResponseReasonCode("3", "270", "The line item [item number] is invalid.", "A value submitted in x_line_item for the item referenced is invalid. ");
 			addResponseReasonCode("3", "271", "The number of line items submitted is not allowed. A maximum of 30 line items can be submitted.", "The number of line items submitted in x_line_item exceeds the allowed maximum of 30. ");
-			
-			
 			addResponseReasonCode("4", "193", "The transaction is currently under review.", "The transaction was placed under review by the risk management system. ");
 			addResponseReasonCode("4", "252", "Your order has been received. Thank you for your business!", "The transaction was accepted, but is being held for merchant review. The merchant may customize the customer response in the Merchant Interface. ");
 			addResponseReasonCode("4", "253", "Your order has been received. Thank you for your business!", "The transaction was accepted and was authorized, but is being held for merchant review. The merchant may customize the customer response in the Merchant Interface. ");
