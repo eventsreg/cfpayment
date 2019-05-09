@@ -249,6 +249,7 @@
 			// set general values
 			structInsert(post, "x_amount", arguments.money.getAmount(), "yes");
 			structInsert(post, "x_type", "AUTH_CAPTURE", "yes");
+			//structInsert(post, "x_currency_code", "USD", "yes");
 
 			switch (lcase(listLast(getMetaData(arguments.account).fullname, "."))) {
 				case "creditcard": {
@@ -278,6 +279,7 @@
 			// set general values
 			structInsert(post, "x_amount", arguments.money.getAmount(), "yes");
 			structInsert(post, "x_type", "AUTH_ONLY", "yes");
+			//structInsert(post, "x_currency_code", "USD", "yes");
 
 			switch (lcase(listLast(getMetaData(arguments.account).fullname, "."))) {
 				case "creditcard": {
@@ -308,6 +310,7 @@
 			structInsert(post, "x_amount", arguments.money.getAmount(), "yes");
 			structInsert(post, "x_type", "PRIOR_AUTH_CAPTURE", "yes");
 			structInsert(post, "x_trans_id", arguments.authorization, "yes");
+			//structInsert(post, "x_currency_code", "USD", "yes");
 
 			// capture can also take optional values:
 			// TODO: define optional values
@@ -329,6 +332,7 @@
 			structInsert(post, "x_amount", arguments.money.getAmount(), "yes");
 			structInsert(post, "x_type", "CREDIT", "yes");
 			structInsert(post, "x_trans_id", arguments.transactionid, "yes");
+			//structInsert(post, "x_currency_code", "USD", "yes");
 
 			if ( arguments.keyExists("account") ) {
 				switch (lcase(listLast(getMetaData(arguments.account).fullname, "."))) {
@@ -358,6 +362,7 @@
 			// set required values
 			structInsert(post, "x_type", "VOID", "yes");
 			structInsert(post, "x_trans_id", arguments.transactionid, "yes");
+			//structInsert(post, "x_currency_code", "USD", "yes");
 
 			//credit can also take optional values:
 			// TODO: define optional values
