@@ -108,6 +108,8 @@
 			x_invoice_num - unique invoice number
 			x_cust_id - (Up to 20 characters (no symbols)) unique customer id
 			x_description: (Up to 255 (no symbols) The description must be created dynamically on the merchant server or provided on a per-transaction basis. The payment gateway does not perform this function.
+			
+			x_currency_code - ISO 4217 alpha-3 standard, for three-letter currency codes ('USD' is default)
 		--->
 		<cfscript>
 			var response = "";
@@ -121,16 +123,22 @@
 			structAppend(p, arguments.options, true);
 		
 			// Translate to Authorize.net specific name.
-			if (structKeyExists(arguments.options, "orderID")) {
+			if ( structKeyExists(arguments.options, "orderID") ) {
 				structInsert(p, "x_invoice_num", arguments.options.orderID, "yes");
 			}
 
-			if ( structkeyexists(arguments.options, "description") && len(arguments.options["description"])) {
+			if ( structkeyexists(arguments.options, "description") && len(arguments.options.description) ) {
 				structInsert(p, "x_description", rereplace(left(arguments.options["description"],255),"[^a-zA-Z0-9 \.]","","all"), "yes");
 			}
 
-			if ( structkeyexists(arguments.options, "customerId") && len(arguments.options["customerId"])) {
+			if ( structkeyexists(arguments.options, "customerId") && len(arguments.options.customerId) ) {
 				structInsert(p, "x_cust_id", rereplace(left(arguments.options["customerId"],255),"[^a-zA-Z0-9 \.]","","all"), "yes");
+			}
+
+			if ( structkeyexists(arguments.options, "currencyCode") && len(arguments.options.currencyCode) ) {
+				structInsert(p, "x_currency_code", arguments.options.currencyCode, "yes");
+			} else {
+				structInsert(p, "x_currency_code", "USD", "yes");
 			}
 		
 			// Configure the gateway environment variables.
@@ -214,14 +222,13 @@
 					structInsert(results, "result", "APPROVED", "yes");
 				else
 					structInsert(results, "result", "CAPTURED", "yes");
-			}
-			else if (response.getStatus() eq getService().getStatusDeclined()) {
-				if (results.x_type EQ "auth_only")
+			} else if (response.getStatus() eq getService().getStatusDeclined()) {
+				if (results.x_type EQ "auth_only") {
 					structInsert(results, "result", "NOT APPROVED", "yes");
-				else
+				} else {
 					structInsert(results, "result", "NOT CAPTURED", "yes");
-			}
-			else {
+				}
+			} else {
 				structInsert(results, "result", "ERROR", "yes");
 			}
 
@@ -249,7 +256,6 @@
 			// set general values
 			structInsert(post, "x_amount", arguments.money.getAmount(), "yes");
 			structInsert(post, "x_type", "AUTH_CAPTURE", "yes");
-			//structInsert(post, "x_currency_code", "USD", "yes");
 
 			switch (lcase(listLast(getMetaData(arguments.account).fullname, "."))) {
 				case "creditcard": {
@@ -279,7 +285,6 @@
 			// set general values
 			structInsert(post, "x_amount", arguments.money.getAmount(), "yes");
 			structInsert(post, "x_type", "AUTH_ONLY", "yes");
-			//structInsert(post, "x_currency_code", "USD", "yes");
 
 			switch (lcase(listLast(getMetaData(arguments.account).fullname, "."))) {
 				case "creditcard": {
@@ -310,7 +315,6 @@
 			structInsert(post, "x_amount", arguments.money.getAmount(), "yes");
 			structInsert(post, "x_type", "PRIOR_AUTH_CAPTURE", "yes");
 			structInsert(post, "x_trans_id", arguments.authorization, "yes");
-			//structInsert(post, "x_currency_code", "USD", "yes");
 
 			// capture can also take optional values:
 			// TODO: define optional values
@@ -332,7 +336,6 @@
 			structInsert(post, "x_amount", arguments.money.getAmount(), "yes");
 			structInsert(post, "x_type", "CREDIT", "yes");
 			structInsert(post, "x_trans_id", arguments.transactionid, "yes");
-			//structInsert(post, "x_currency_code", "USD", "yes");
 
 			if ( arguments.keyExists("account") ) {
 				switch (lcase(listLast(getMetaData(arguments.account).fullname, "."))) {
@@ -362,7 +365,6 @@
 			// set required values
 			structInsert(post, "x_type", "VOID", "yes");
 			structInsert(post, "x_trans_id", arguments.transactionid, "yes");
-			//structInsert(post, "x_currency_code", "USD", "yes");
 
 			//credit can also take optional values:
 			// TODO: define optional values
