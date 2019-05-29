@@ -3,6 +3,8 @@
 	<cfset variables.cfpayment.GATEWAY_VERSION = "1.0" />
 	<cfset variables.cfpayment.GATEWAY_LIVE_URL = "https://payflowpro.paypal.com/transaction" />
 	<cfset variables.cfpayment.GATEWAY_TEST_URL = "https://pilot-payflowpro.paypal.com/transaction" />
+
+	<!--- https://www.paypalobjects.com/webstatic/en_US/developer/docs/pdf/pp_payflowpro_xmlpay_guide.pdf --->
 	
 	<cfset variables.payflowpro = {} />
 	<cfset variables.payflowpro["0"] = "Transaction approved." />
@@ -174,6 +176,57 @@
 		<cfargument name="options" type="struct" required="false" default="#structNew()#" />
 
 		<cfset var xmlRequest = "" />
+
+		<!--// 
+				<!ELEMENT TotalAmt (#PCDATA)>
+				<!ATTLIST TotalAmt Currency CDATA #IMPLIED>
+
+				<TotalAmt Currency="840">1.23</TotalAmt>
+
+
+				TABLE G.4 FDMS South currency codes
+				Currency Name					Currency Code		Decimal Positions
+				Argentine Peso 					32 					2
+				Australian Dollar 				36 					2
+				Austrian Schilling 				40 					2
+				Belgian Franc 					56 					0
+				Canadian Dollar 				124 				2
+				Chilean Peso 					152 				2
+				Czech Koruna 					203 				2
+				Danish Krone 					208 				2
+				Dominican Peso 					214 				2
+				Markka 							246 				2
+				French Franc 					250 				2
+				Deutsche Mark 					280 				2
+				Drachma 						300 				0
+				Hong Kong Dollar 				344 				2
+				Indian Rupee 					356 				2
+				Irish Punt 						372 				2
+				Shekel 							376 				2
+				Italian Lira 					380 				0
+				Yen 							392 				0
+				Won 							410 				0
+				Luxembourg Franc 				442 				0
+				Mexican Duevo Peso 				484 				2
+				Netherlands Guilder 			528 				2
+				New Zealand Dollar 				554 				2
+				Norwegian Frone 				578 				2
+				Philippine Peso 				608 				2
+				Portuguese Escudo 				620 				0
+				Rand 							710 				2
+				Spanish Peseta 					724 				0
+				Swedish Krona 					752 				2
+				Swiss Franc 					756 				2
+				Thailand Baht 					764 				2
+				Pound Sterling 					826 				2
+				Russian Ruble 					810 				2
+				U.S Dollar 						840 				2
+				Bolivar 						862 				2
+				New Taiwan Dollar 				901 				2
+				Euro 							978 				2
+				Polish New Zloty 				985 				2
+				Brazilian Real 					986 				2
+		//-->
 		
 		<cfswitch expression="#lcase(listLast(getMetaData(arguments.account).fullname, "."))#">
 			<cfcase value="creditcard">
