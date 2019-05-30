@@ -1,5 +1,5 @@
 <!---
-	$Id: braintree.cfc 176 2012-03-15 02:24:23Z briang $
+	$Id$
 	
 	Copyright 2008 Brian Ghidinelli (http://www.ghidinelli.com/)
 	
@@ -218,10 +218,10 @@
 					</cfif>
 					
 					<!--- handle common "success" fields --->
-					<cfif structKeyExists(results, "avsresponse")>
+					<cfif structKeyExists(results, "avsresponse") AND len(results.avsresponse)>
 						<cfset response.setAVSCode(results.avsresponse) />					
 					</cfif>
-					<cfif structKeyExists(results, "cvvresponse")>
+					<cfif structKeyExists(results, "cvvresponse") AND len(results.cvvresponse)>
 						<cfset response.setCVVCode(results.cvvresponse) />					
 					</cfif>				
 	
@@ -277,7 +277,7 @@
 		
 		<cfelseif structKeyExists(arguments, "account")>
 
-			<cfswitch expression="#lcase(listLast(getMetaData(arguments.account).fullname, "."))#">
+			<cfswitch expression="#getService().getAccountType(arguments.account)#">
 				<cfcase value="creditcard">
 					<!--- copy in name and customer details --->
 					<cfset post = addCustomer(post = post, account = arguments.account) />
@@ -293,7 +293,7 @@
 					<cfset post = addToken(post = post, account = arguments.account, options = arguments.options) />
 				</cfcase>
 				<cfdefaultcase>
-					<cfthrow type="cfpayment.InvalidAccount" message="The account type #lcase(listLast(getMetaData(arguments.account).fullname, "."))# is not supported by this gateway." />
+					<cfthrow type="cfpayment.InvalidAccount" message="The account type #getService().getAccountType(arguments.account)# is not supported by this gateway." />
 				</cfdefaultcase>
 			</cfswitch>
 
@@ -327,7 +327,7 @@
 		
 		<cfelseif structKeyExists(arguments, "account")>
 	
-			<cfswitch expression="#lcase(listLast(getMetaData(arguments.account).fullname, "."))#">
+			<cfswitch expression="#getService().getAccountType(arguments.account)#">
 				<cfcase value="creditcard">
 					<!--- copy in name and customer details --->
 					<cfset post = addCustomer(post = post, account = arguments.account) />
@@ -340,7 +340,7 @@
 					<cfset post = addToken(post = post, account = arguments.account, options = arguments.options) />
 				</cfcase>
 				<cfdefaultcase>
-					<cfthrow type="cfpayment.Invalid.AccountType" message="The account type #lcase(listLast(getMetaData(arguments.account).fullname, "."))# is not supported by this gateway." />
+					<cfthrow type="cfpayment.InvalidAccount" message="The account type #getService().getAccountType(arguments.account)# is not supported by this gateway." />
 				</cfdefaultcase>
 			</cfswitch>
 
@@ -374,7 +374,7 @@
 		
 		<cfelseif structKeyExists(arguments, "account")>
 
-			<cfswitch expression="#lcase(listLast(getMetaData(arguments.account).fullname, "."))#">
+			<cfswitch expression="#getService().getAccountType(arguments.account)#">
 				<cfcase value="creditcard">
 					<!--- copy in name and customer details --->
 					<cfset post = addCustomer(post = post, account = arguments.account) />
@@ -387,7 +387,7 @@
 					<cfthrow message="Validate not implemented for vault tokens; use authorize instead." type="cfpayment.MethodNotImplemented" />
 				</cfcase>
 				<cfdefaultcase>
-					<cfthrow type="cfpayment.Invalid.AccountType" message="The account type #lcase(listLast(getMetaData(arguments.account).fullname, "."))# is not supported by this gateway." />
+					<cfthrow type="cfpayment.InvalidAccount" message="The account type #getService().getAccountType(arguments.account)# is not supported by this gateway." />
 				</cfdefaultcase>
 			</cfswitch>
 
@@ -457,10 +457,14 @@
 		<!--- set general values --->
 		<cfset post["amount"] = arguments.money.getAmount() />
 
-		<cfif structKeyExists(arguments, "account") AND lcase(listLast(getMetaData(arguments.account).fullname, ".")) EQ "eft">
+		<cfif structKeyExists(arguments, "account") AND getService().getAccountType(arguments.account) EQ "eft">
 			<!--- in the direct deposit scenario, we need the account --->
 			<cfset post["type"] = "credit" />
 			<cfset post = addEFT(post = post, account = arguments.account, options = arguments.options) />
+		<cfelseif structKeyExists(arguments, "account") AND getService().getAccountType(arguments.account) EQ "token">
+			<!--- direct deposit using the vault --->
+			<cfset post["type"] = "credit" />
+			<cfset post = addToken(post = post, account = arguments.account) />
 		<cfelseif structKeyExists(arguments.options, "tokenId")>
 			<!--- direct deposit using the vault --->
 			<cfset post["type"] = "credit" />
@@ -468,6 +472,8 @@
 		<cfelseif structKeyExists(arguments, "transactionid")>
 			<cfset post["type"] = "refund" />
 			<cfset post["transactionid"] = arguments.transactionid />
+		<cfelse>
+			<cfthrow type="cfpayment.InvalidAccount" message="An account type of EFT, token or a tokenId or transactionId must be provided" />
 		</cfif>
 
 		<cfreturn process(payload = post, options = options) />
@@ -532,7 +538,7 @@
 		<cfset var post = structNew() />
 		<cfset var res = "" />
 		
-		<cfswitch expression="#lcase(listLast(getMetaData(arguments.account).fullname, "."))#">
+		<cfswitch expression="#getService().getAccountType(arguments.account)#">
 			<cfcase value="creditcard">
 				<cfset post = addCreditCard(post = post, account = arguments.account, options = arguments.options) />
 			</cfcase>
@@ -565,7 +571,7 @@
 		<cfset var post = structNew() />
 		<cfset var res = "" />
 
-		<cfif lcase(listLast(getMetaData(arguments.account).fullname, ".")) NEQ "token">
+		<cfif getService().getAccountType(arguments.account) NEQ "token">
 			<cfthrow type="cfpayment.InvalidAccount" message="Only an account type of token is supported by this method." />
 		</cfif>
 			
@@ -759,10 +765,10 @@
 				</cfif>
 				
 				<!--- handle common "success" fields --->
-				<cfif structKeyExists(results, "avs_response")>
+				<cfif structKeyExists(results, "avs_response") AND len(results.avs_response.xmlText)>
 					<cfset response.setAVSCode(results.avs_response.xmlText) />
 				</cfif>
-				<cfif structKeyExists(results, "csc_response")>
+				<cfif structKeyExists(results, "csc_response") AND len(results.csc_response.xmlText)>
 					<cfset response.setCVVCode(results.csc_response.xmlText) />
 				</cfif>				
 			
@@ -788,6 +794,13 @@
 		
 	</cffunction>
 
+
+	<!--- braintree createResponse() overrides the AVS/CVV responses --->
+	<cffunction name="createResponse" access="private" output="false" returntype="any" hint="Create a Braintree response object with status set to unprocessed">
+		<cfreturn createObject("component", "cfpayment.api.gateway.braintree.response").init(argumentCollection = arguments, service = getService()) />
+	</cffunction>
+	
+	
 
 	<!--- HELPER FUNCTIONS TO MAKE LIFE EASIER IN COLDFUSION LAND --->
 	<cffunction name="generateHash" output="false" access="public" returntype="string">
