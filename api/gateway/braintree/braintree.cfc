@@ -1,90 +1,50 @@
 <!---
-	$Id$
-	
-	Copyright 2008 Brian Ghidinelli (http://www.ghidinelli.com/)
-	
-	Licensed under the Apache License, Version 2.0 (the "License"); you 
-	may not use this file except in compliance with the License. You may 
-	obtain a copy of the License at:
-	 
-		http://www.apache.org/licenses/LICENSE-2.0
-		 
-	Unless required by applicable law or agreed to in writing, software 
-	distributed under the License is distributed on an "AS IS" BASIS, 
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-	See the License for the specific language governing permissions and 
-	limitations under the License.
+	// braintree gateway updated to use Braintree Java SDK 2.95.0
 --->
 <cfcomponent displayname="Braintree Interface" extends="cfpayment.api.gateway.base" hint="Braintree Gateway" output="false">
+    <cfscript>
+        variables.braintree = {
+            "100" = "Transaction was approved",
+            "200" = "Transaction was declined by processor",
+            "201" = "Do Not Honor",
+            "202" = "Insufficient Funds",
+            "203" = "Over Limit",
+            "204" = "Transaction not allowed",
+            "220" = "Incorrect Payment Data",
+            "221" = "No such card issuer",
+            "222" = "No card number on file with Issuer",
+            "223" = "Expired card",
+            "224" = "Invalid expiration date",
+            "225" = "Invalid card security code",
+            "240" = "Call Issuer for further information",
+            "250" = "Pick up card",
+            "251" = "Lost card",
+            "252" = "Stolen card",
+            "253" = "Fraudulent card",
+            "260" = "Declined with further instructions available (see response text)",
+            "261" = "Declined - Stop all recurring payments",
+            "262" = "Declined - Stop this recurring program", 
+            "263" = "Declined - Updated cardholder data available", 
+            "264" = "Declined - Retry in a few days",
+            "300" = "Transaction was rejected by gateway",
+            "400" = "Transaction error returned by processor",
+            "410" = "Invalid merchant configuration",
+            "411" = "Merchant account is inactive",
+            "420" = "Communication error",
+            "421" = "Communication error with issuer",
+            "430" = "Duplicate transaction at processor",
+            "440" = "Processor format error",
+            "441" = "Invalid transaction information",
+            "460" = "Processor feature not available",
+            "461" = "Unsupported card type"
+        }
 
-	<cfset variables.cfpayment.GATEWAY_NAME = "Braintree" />
-	<cfset variables.cfpayment.GATEWAY_VERSION = "1.0" />
-	<!--- braintree test mode uses different username/password instead of different urls --->
-	<cfset variables.cfpayment.GATEWAY_LIVE_URL = "https://secure.braintreepaymentgateway.com/api/transact.php" />
-	<cfset variables.cfpayment.GATEWAY_TEST_URL = variables.cfpayment.GATEWAY_LIVE_URL />
-	<cfset variables.cfpayment.GATEWAY_REPORT_URL = "https://secure.braintreepaymentgateway.com/api/query.php" />
-
-	<cfset variables.braintree = structNew() />
-	<cfset variables.braintree["100"] = "Transaction was approved" />
-	<cfset variables.braintree["200"] = "Transaction was declined by Processor" />
-	<cfset variables.braintree["201"] = "Do Not Honor" />
-	<cfset variables.braintree["202"] = "Insufficient Funds" />
-	<cfset variables.braintree["203"] = "Over Limit" />
-	<cfset variables.braintree["204"] = "Transaction not allowed" />
-	<cfset variables.braintree["220"] = "Incorrect Payment Data" />
-	<cfset variables.braintree["221"] = "No such card issuer" />
-	<cfset variables.braintree["222"] = "No card number on file with Issuer" />
-	<cfset variables.braintree["223"] = "Expired card" />
-	<cfset variables.braintree["224"] = "Invalid expiration date" />
-	<cfset variables.braintree["225"] = "Invalid card security code" />
-	<cfset variables.braintree["240"] = "Call Issuer for further information" />
-	<cfset variables.braintree["250"] = "Pick up card" />
-	<cfset variables.braintree["251"] = "Lost card" />
-	<cfset variables.braintree["252"] = "Stolen card" />
-	<cfset variables.braintree["253"] = "Fraudulent card" />
-	<cfset variables.braintree["260"] = "Declined with further instructions available (see response text)" />
-	<cfset variables.braintree["261"] = "Declined - Stop all recurring payments" />
-	<cfset variables.braintree["262"] = "Declined - Stop this recurring program" /> 
-	<cfset variables.braintree["263"] = "Declined - Updated cardholder data available" /> 
-	<cfset variables.braintree["264"] = "Declined - Retry in a few days" />
-	<cfset variables.braintree["300"] = "Transaction was rejected by gateway" />
-	<cfset variables.braintree["400"] = "Transaction error returned by processor" />
-	<cfset variables.braintree["410"] = "Invalid merchant configuration" />
-	<cfset variables.braintree["411"] = "Merchant account is inactive" />
-	<cfset variables.braintree["420"] = "Communication error" />
-	<cfset variables.braintree["421"] = "Communication error with issuer" />
-	<cfset variables.braintree["430"] = "Duplicate transaction at processor" />
-	<cfset variables.braintree["440"] = "Processor format error" />
-	<cfset variables.braintree["441"] = "Invalid transaction information" />
-	<cfset variables.braintree["460"] = "Processor feature not available" />
-	<cfset variables.braintree["461"] = "Unsupported card type" />
+        
 
 
-	<!--- make a way of setting the key/key id used in hash calculations --->
-	<cffunction name="getSecurityKey" access="public" output="false" returntype="string">
-		<cfif getTestMode()>
-			<cfreturn "844wfNN5FGuGS7wtKfQsY6k6ZxAv6Ff7" />
-		<cfelse>
-			<cfreturn variables.SecurityKey />
-		</cfif>
-	</cffunction>
-	<cffunction name="setSecurityKey" access="public" output="false" returntype="void">
-		<cfargument name="SecurityKey" type="string" required="true" />
-		<cfset variables.SecurityKey = arguments.SecurityKey />
-	</cffunction>
 
-	<cffunction name="getSecurityKeyID" access="public" output="false" returntype="numeric">
-		<cfif getTestMode()>
-			<cfreturn 1247307 />
-		<cfelse>
-			<cfreturn variables.SecurityKeyID />
-		</cfif>
-	</cffunction>
-	<cffunction name="setSecurityKeyID" access="public" output="false" returntype="void">
-		<cfargument name="SecurityKeyID" type="numeric" required="true" />
-		<cfset variables.SecurityKeyID = arguments.SecurityKeyID />
-	</cffunction>
-
+        
+    </cfscript>
 
 	<!--- process wrapper with gateway/transaction error handling --->
 	<cffunction name="process" output="false" access="private" returntype="any">
