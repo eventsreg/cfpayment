@@ -835,7 +835,7 @@
             text = "Processor Network Unavailable – Try Again",
             description = "An error occurred when trying to process the transaction. Please attempt the transaction again in a few moments - if the decline persists, please contact us with this error code: 3000.",
             decline_type = "Soft"
-        },
+        }
     ]
 
     avs_address_response_codes = [
@@ -979,21 +979,20 @@
             trans_request = createObject("java", "com.braintreegateway.TransactionRequest", "/jars/braintree-java-2.96.0.jar");
 
             credit_card_request = trans_request
-                .amount(javacast("bigdecimal", 5002.00))
-                .orderId(jstr("TESTORDER-56"))
+                .amount(javacast("bigdecimal", 5076.00))
+                .orderId(jstr("TESTORDER-76"))
                 .merchantAccountId(acct.getId())
-                .customField("trackingnumber", "11156")
+                .customField("trackingnumber", "11176")
                 .customField("event", "E-vents Registration Test Event")
                 .customer()
                     .firstName(jstr("Joe"))
                     .lastName(jstr("Smith"))
                     .company(jstr("E-vents Registration"))
-                    .phone(jstr("312-555-1234"))
                     .email(jstr("drew@example.com"))
                     .done()
                 .creditCard()
                     .number(jstr("4217651111111119"))
-                    .cvv(jstr("200"))
+                    .cvv(jstr("999"))
                     .expirationDate(jstr("03/22"))
                     .cardholderName(jstr("Joe S. Smith"))
                     .done()
@@ -1001,11 +1000,10 @@
                     .firstName(jstr("Joe"))
                     .lastName(jstr("Smith"))
                     .company(jstr("E-vents Registration"))
-                    .streetAddress(jstr("1 E Main St"))
-                    .extendedAddress(jstr("Suite 403"))
+                    .streetAddress(jstr("999 N Main St"))
                     .locality(jstr("Chicago"))
                     .region(jstr("IL"))
-                    .postalCode(jstr("60622"))
+                    .postalCode(jstr("12121"))
                     .countryCodeAlpha2(jstr("US"))
                     .done()
                 .options()
@@ -1135,15 +1133,14 @@
             dump(result.getErrors() !== Null ? result.getErrors() : "no errors");
 
             transaction = result.getTransaction() === Null ? result.getTarget() : result.getTransaction();
-            actual_transaction = gw.transaction().find(jstr(transaction.getId()));
 
+            gw.testing().settle(transaction.getId());
 
-
-
-            dump(actual_transaction.getStatus());
-
+            refund = gw.transaction().refund(transaction.getId());
+            refund_transaction = refund.getTransaction() === Null ? refund.getTarget() : refund.getTransaction();
             
-
+            dump(refund);
+            dump(refund_transaction);
 
         } else {
             echo("the sandbox account is not active");

@@ -38,6 +38,12 @@
 	<cfset variables.cfpayment.MerchantAccount = "" />
 	<cfset variables.cfpayment.Username = "" />
 	<cfset variables.cfpayment.Password = "" />
+	<cfset variables.cfpayment.Vendor = "" />
+	<cfset variables.cfpayment.Partner = "" />
+	<cfset variables.cfpayment.MerchantId = "" />
+	<cfset variables.cfpayment.MerchantAccountId = "" />
+	<cfset variables.cfpayment.PublicKey = "" />
+	<cfset variables.cfpayment.PrivateKey = "" />
 	<cfset variables.cfpayment.Timeout = 600 />
 	<cfset variables.cfpayment.TestMode = true />
 	
@@ -115,8 +121,7 @@
 		</cfif>
 	</cffunction>
 
-
-	<!--- 	Date: 7/6/2008  Usage: get access to the service for generating responses, errors, etc --->
+	<!--- Usage: get access to the service for generating responses, errors, etc --->
 	<cffunction name="getService" output="false" access="private" returntype="any" hint="get access to the service for generating responses, errors, etc">
 		<cfreturn variables.cfpayment.service />
 	</cffunction>
@@ -154,13 +159,42 @@
 		<cfargument name="Partner" type="any" required="true" />
 		<cfset variables.cfpayment.Partner = arguments.Partner />
 	</cffunction>
-	
 	<cffunction name="getVendor" access="package" output="false" returntype="any">
 		<cfreturn variables.cfpayment.Vendor />
 	</cffunction>
 	<cffunction name="setVendor" access="package" output="false" returntype="void">
 		<cfargument name="Vendor" type="any" required="true" />
 		<cfset variables.cfpayment.Vendor = arguments.Vendor />
+	</cffunction>
+
+	<!--- merchant account id (aka name), merchant id, public key, and private key are used by Braintree gateway --->
+	<cffunction name="getMerchantAccountId" access="package" output="false" returntype="any">
+		<cfreturn variables.cfpayment.MerchantAccountId />
+	</cffunction>
+	<cffunction name="setMerchantAccountId" access="package" output="false" returntype="void">
+		<cfargument name="MerchantAccountId" type="any" required="true" />
+		<cfset variables.cfpayment.MerchantAccountId = arguments.MerchantAccountId />
+	</cffunction>
+	<cffunction name="getMerchantId" access="package" output="false" returntype="any">
+		<cfreturn variables.cfpayment.MerchantId />
+	</cffunction>
+	<cffunction name="setMerchantId" access="package" output="false" returntype="void">
+		<cfargument name="MerchantId" type="any" required="true" />
+		<cfset variables.cfpayment.MerchantId = arguments.MerchantId />
+	</cffunction>
+	<cffunction name="getPublicKey" access="package" output="false" returntype="any">
+		<cfreturn variables.cfpayment.PublicKey />
+	</cffunction>
+	<cffunction name="setPublicKey" access="package" output="false" returntype="void">
+		<cfargument name="PublicKey" type="any" required="true" />
+		<cfset variables.cfpayment.PublicKey = arguments.PublicKey />
+	</cffunction>
+	<cffunction name="getPrivateKey" access="package" output="false" returntype="any">
+		<cfreturn variables.cfpayment.PrivateKey />
+	</cffunction>
+	<cffunction name="getPrivateKey" access="package" output="false" returntype="void">
+		<cfargument name="PrivateKey" type="any" required="true" />
+		<cfset variables.cfpayment.PrivateKey = arguments.PrivateKey />
 	</cffunction>
 
 	<!--- the gatewayid is a value used by the transaction/HA apis to differentiate
