@@ -872,8 +872,9 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 						transaction_id = transaction.getId()
 					}
 
-					response.setStatus(result.isSuccess() ? getService().getStatusSuccessful() : getService().getStatusDeclined());	
-					response.setResult(mapped_response_values.response_code & ": " & transaction.getProcessorResponseText());
+					response.setStatus(result.isSuccess() ? getService().getStatusSuccessful() : getService().getStatusDeclined());
+					response.setResult(avs_status.valid && cvv_status.valid ? mapped_response_values.response_code & ": " & transaction.getProcessorResponseText() : avs_status.valid ? cvv_status.cvv_message : avs_status.avs_message);
+					// response.setResult(mapped_response_values.response_code & ": " & transaction.getProcessorResponseText());
 					response.setMessage(mapped_response_values.message);
 					response.setTransactionID(mapped_response_values.transaction_id);
 					response.setAuthorization(mapped_response_values.authorization_code);
