@@ -1,7 +1,6 @@
 component displayname="Braintree Interface" extends="cfpayment.api.gateway.base" {
-	/*	
-		braintree gateway updated to use Braintree Java SDK 2.96.0:  06/2019
-	*/
+	variables.cfpayment.GATEWAY_NAME = "Braintree";
+	variables.cfpayment.GATEWAY_VERSION = "2.96.0"; // uses Java SDK 2.96.0
 
 	variables.authorization_response_codes = [
 		{
@@ -643,42 +642,50 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		{
 			code = "M",
 			response = "Street Address matches (M)",
-			description = "The street address provided matches the information on file with the cardholder's bank."
+			description = "The street address provided matches the information on file with the cardholder's bank.",
+			passes = true
 		},
 		{
 			code = "N",
 			response = "Street Address does not match (N)",
-			description = "The street address provided does not match the information on file with the cardholder's bank."
+			description = "The street address provided does not match the information on file with the cardholder's bank.",
+			passes = false
 		},
 		{
 			code = "U",
 			response = "Street Address not verified (U)",
-			description = "The card-issuing bank received the street address but did not verify whether it was correct. This typically happens if the processor declines an authorization before the bank evaluates the address."
+			description = "The card-issuing bank received the street address but did not verify whether it was correct. This typically happens if the processor declines an authorization before the bank evaluates the address.",
+			passes = true
 		},
 		{
 			code = "I",
 			response = "Street Address not provided (I)",
-			description = "No street address was provided."
+			description = "No street address was provided.",
+			passes = true
 		},
 		{
 			code = "S",
 			response = "Issuing bank does not support AVS (S)",
-			description = "AVS information was provided but the card-issuing bank does not participate in address verification. This typically indicates a card-issuing bank outside of the US, Canada, and the UK."
+			description = "AVS information was provided but the card-issuing bank does not participate in address verification. This typically indicates a card-issuing bank outside of the US, Canada, and the UK.",
+			passes = true
 		},
 		{
 			code = "E",
 			response = "AVS system error (E)",
-			description = "A system error prevented any verification of street address or postal code."
+			description = "A system error prevented any verification of street address or postal code.",
+			passes = true
 		},
 		{
 			code = "A",
 			response = "AVS not applicable (A)",
-			description = "AVS information was provided but this type of transaction does not support address verification."
+			description = "AVS information was provided but this type of transaction does not support address verification.",
+			passes = true
 		},
 		{
 			code = "B",
 			response = "AVS skipped (B)",
-			description = "AVS checks were skipped for this transaction."
+			description = "AVS checks were skipped for this transaction.",
+			passes = true
 		}
 	]
 
@@ -686,42 +693,50 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		{
 			code = "M",
 			response = "Postal Code matches (M)",
-			description = "The postal code provided matches the information on file with the cardholder's bank."
+			description = "The postal code provided matches the information on file with the cardholder's bank.",
+			passes = true
 		},
 		{
 			code = "N",
 			response = "Postal Code does not match (N)",
-			description = "The postal code provided does not match the information on file with the cardholder's bank."
+			description = "The postal code provided does not match the information on file with the cardholder's bank.",
+			passes = false
 		},
 		{
 			code = "U",
 			response = "Postal Code not verified (U)",
-			description = "The card-issuing bank received the postal code but did not verify whether it was correct. This typically happens if the processor declines an authorization before the bank evaluates the postal code."
+			description = "The card-issuing bank received the postal code but did not verify whether it was correct. This typically happens if the processor declines an authorization before the bank evaluates the postal code.",
+			passes = true
 		},
 		{
 			code = "I",
 			response = "Postal Code not provided (I)",
-			description = "No postal code was provided."
+			description = "No postal code was provided.",
+			passes = true
 		},
 		{
 			code = "S",
 			response = "Issuing bank does not support AVS (S)",
-			description = "AVS information was provided but the card-issuing bank does not participate in address verification. This typically indicates a card-issuing bank outside of the US, Canada, and the UK."
+			description = "AVS information was provided but the card-issuing bank does not participate in address verification. This typically indicates a card-issuing bank outside of the US, Canada, and the UK.",
+			passes = true
 		},
 		{
 			code = "E",
 			response = "AVS system error (E)",
-			description = "A system error prevented any verification of street address or postal code."
+			description = "A system error prevented any verification of street address or postal code.",
+			passes = true
 		},
 		{
 			code = "A",
 			response = "AVS not applicable (A)",
-			description = "AVS information was provided but this type of transaction does not support address verification."
+			description = "AVS information was provided but this type of transaction does not support address verification.",
+			passes = true
 		},
 		{
 			code = "B",
 			response = "AVS skipped (B)",
-			description = "AVS checks were skipped for this transaction."
+			description = "AVS checks were skipped for this transaction.",
+			passes = true
 		}
 	]
 
@@ -729,60 +744,77 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		{
 			code = "M",
 			response = "CVV matches (M)",
-			description = "The CVV provided matches the information on file with the cardholder's bank."
+			description = "The CVV provided matches the information on file with the cardholder's bank.",
+			passes = true
 		},
 		{
 			code = "N",
 			response = "CVV does not match (N)",
-			description = "The CVV provided does not match the information on file with the cardholder's bank."
+			description = "The CVV provided does not match the information on file with the cardholder's bank.",
+			passes = false
 		},
 		{
 			code = "U",
 			response = "CVV is not verified (U)",
-			description = "The card-issuing bank received the CVV, but did not verify whether it was correct. This typically happens if the bank declines an authorization before evaluating the CVV."
+			description = "The card-issuing bank received the CVV, but did not verify whether it was correct. This typically happens if the bank declines an authorization before evaluating the CVV.",
+			passes = true
 		},
 		{
 			code = "I",
 			response = "CVV not provided (I)",
-			description = "No CVV was provided. This also happens if the transaction was made with a vaulted payment method."
+			description = "No CVV was provided. This also happens if the transaction was made with a vaulted payment method.",
+			passes = false
 		},
 		{
 			code = "S",
 			response = "Issuer does not participate (S)",
-			description = "The CVV was provided but the card-issuing bank does not participate in card verification."
+			description = "The CVV was provided but the card-issuing bank does not participate in card verification.",
+			passes = true
 		},
 		{
 			code = "A",
 			response = "CVV not applicable (A)",
-			description = "The CVV was provided but this type of transaction does not support card verification."
+			description = "The CVV was provided but this type of transaction does not support card verification.",
+			passes = true
 		},
 		{
 			code = "B",
 			response = "CVV skipped (B)",
-			description = "CVV checks were skipped for this transaction."
+			description = "CVV checks were skipped for this transaction.",
+			passes = true
 		}
 	]
 
-	function private any process(required struct payload, struct options = {}) {
+	private any function process(required struct payload, struct options = {}) {
 		service = getService();
-		response = createObject("component", "cfpayment.api.model.response").init(argumentCollection = arguments, service = service);
+		response_args = { 
+			Status = service.getStatusPending(), 
+			StatusCode = "", 
+			Result = "", 
+			Message = "", 
+			RequestData = getTestMode() ? { payload = duplicate(payload) } : {}, 
+			TestMode = getTestMode() 
+		}
+
+		response = createObject("component", "cfpayment.api.model.response").init(argumentCollection = response_args, service = service);
 
 		try {
 			env = createObject("java", "com.braintreegateway.Environment", "/jars/braintree-java-2.96.0.jar");
 			gw = createObject("java", "com.braintreegateway.BraintreeGateway", "/jars/braintree-java-2.96.0.jar").init(
 				env.Sandbox,
-				jstr(getMerchantId),
-				jstr(getPublicKey()),
-				jstr(getPrivateKey())
+				getMerchantId(),
+				getPublicKey(),
+				getPrivateKey()
 			);
-			acct = gw.merchantAccount().find(jstr(getMerchantAccountId));
+
+			acct = gw.merchantAccount().find(getMerchantAccountId());
 
 			if ( acct.getStatus().name() == "ACTIVE" ) {
 				if ( payload.type == "sale" ) {
 					trans_request = createObject("java", "com.braintreegateway.TransactionRequest", "/jars/braintree-java-2.96.0.jar");
 		
 					credit_card_request = trans_request
-						.amount(javacast("bigdecimal", payload.amount))
+						.amount(javacast("bigdecimal", val(payload.amount)))
 						.orderId(options.keyExists("orderID") ? jstr(options.orderID) : jstr(""))
 						.merchantAccountId(acct.getId())
 						.customer()
@@ -814,14 +846,18 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 					result = gw.transaction().sale(credit_card_request); // sending to the Braintree gateway
 					transaction = result.getTransaction() === Null ? result.getTarget() : result.getTransaction(); // depending on response, transaction object could be getTransaction() or getTarget()
 
-					response_code_message = authorization_response_codes.filter(function(code) {
-						return code.code == transaction.getProcessorAuthorizationCode()
+					response_code_message = variables.authorization_response_codes.filter(function(code) {
+						return code.code == transaction.getProcessorResponseCode()
 					}).reduce(function(init, c) {
 						return c.keyExists("decline_type") ? "Declined#( len(c.description) > 0 ? ": #c.description#" : "" )#" : c.text
-					}, result.getMessage()); // intended to be shown to registrant, so it is more human-readable
+					}, transaction.getProcessorResponseText());
+
+					// if the CVV and/or AVS fails, the message should not be based on the response code, but the CVV/AVS code response
+					avs_status = validateAVS(avsCodeStreet = transaction.getAvsStreetAddressResponseCode(), avsCodePostalCode = transaction.getAvsPostalCodeResponseCode());
+					cvv_status = validateCVV(code = transaction.getCvvResponseCode());
 
 					mapped_response_values = {
-						message = response_code_message,
+						message = avs_status.valid && cvv_status.valid ? response_code_message : avs_status.valid ? cvv_status.cvv_message : avs_status.avs_message,
 						authorization_code = transaction.getProcessorAuthorizationCode(),
 						response_code = transaction.getProcessorResponseCode(),
 						response_text = transaction.getProcessorResponseText(),
@@ -834,18 +870,16 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 						avs_postalcode_response_code = transaction.getAvsPostalCodeResponseCode(),
 						avs_streetaddress_response_code = transaction.getAvsStreetAddressResponseCode(),
 						transaction_id = transaction.getId()
-					};
+					}
 
 					response.setStatus(result.isSuccess() ? getService().getStatusSuccessful() : getService().getStatusDeclined());	
+					response.setResult(mapped_response_values.response_code);
+					response.setMessage(mapped_response_values.message);
+					response.setTransactionID(mapped_response_values.transaction_id);
+					response.setAuthorization(mapped_response_values.authorization_code);
+					response.setAVSCode(mapped_response_values.avs_streetaddress_response_code);
+					response.setCVVCode(mapped_response_values.cvv_response_code);
 
-					if ( result.isSuccess() ) {
-						response.setParsedResult(serializejson(mapped_response_values));
-						response.setMessage(mapped_response_values.message);
-						response.setTransactionID(mapped_response_values.transaction_id);
-						response.setAuthorization(mapped_response_values.authorization_code);
-						response.setAVSCode(mapped_response_values.avs_streetaddress_response_code);
-						response.setCVVCode(mapped_response.values.cvv_response_code);
-					}
 				} else if ( payload.type == "void" ) {
 					transaction = gw.transaction().find(jstr(payload.transactionid));
 					transaction_status = transaction.getStatus().name();
@@ -873,7 +907,7 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 						response.setStatus(result.isSuccess() ? getService().getStatusSuccessful() : getService().getStatusDeclined());	
 	
 						if ( result.isSuccess() ) {
-							response.setParsedResult(serializejson(mapped_response_values));
+							response.setParsedResult("");
 							response.setMessage(mapped_response_values.message);
 							response.setTransactionID(mapped_response_values.transaction_id);
 							response.setAuthorization(mapped_response_values.authorization_code);
@@ -910,55 +944,51 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 						response.setStatus(result.isSuccess() ? getService().getStatusSuccessful() : getService().getStatusDeclined());	
 	
 						if ( result.isSuccess() ) {
-							response.setParsedResult(serializejson(mapped_response_values));
+							response.setParsedResult("");
 							response.setMessage(mapped_response_values.message);
 							response.setTransactionID(mapped_response_values.transaction_id);
 							response.setAuthorization(mapped_response_values.authorization_code);
 							response.setAVSCode(mapped_response_values.avs_streetaddress_response_code);
 							response.setCVVCode(mapped_response.values.cvv_response_code);
 						}
-					
-					
-					
-					
-					
-					
-					
 					} else {
 						response.setStatus(getService().getStatusDeclined());	
 					}
 				} else {
-					response.status = getService().getStatusFailure();
+					response.setStatus(getService().getStatusFailure());
 				}
 			} else {
 				response.setStatus(getService().getStatusFailure());
 			}
 		} catch (Any e) {
-			response.status = getService().getStatusFailure();
+			response.setStatus(getService().getStatusFailure());
+			response.setMessage(serializejson(e));
 		}
 
 		return response;
 	}
 
-	function public any purchase(required any money, required any account, any transactionId, struct options = {}) {
+	public any function purchase(required any money, required any account, any transactionId, struct options = {}) {
 		post = {
 			amount = money.getAmount(),
 			type = "sale"
 		}
 
-		if ( getService().getAccountType(account) == "creditcard" ){
+		account_type = lcase(listLast(getMetaData(account).fullname, "."));
+
+		if ( account_type == "creditcard" ) {
 			post = addCustomer(post = post, account = account);
 			post = addCreditCard(post = post, account = account, options = options);
-		} else if ( getService().getAccountType(account) == "token" ) {
-			post = addToken(post = post, account = account, options = options)
+		} else if ( account_type == "token" ) {
+			post = addToken(post = post, account = account, options = options);
 		} else {
-			throw type="cfpayment.InvalidAccount" message="The account type #getService().getAccountType(account)# is not supported by this gateway.";
+			throw type="cfpayment.InvalidAccount";
 		}
 
 		return process(payload = post, options = options);
 	}
 
-	function public any void(required any transactionId, struct options = {}) {
+	public any function void(required any transactionId, struct options = {}) {
 		post = {
 			type = "void",
 			transactionid = transactionId
@@ -967,7 +997,7 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		return process(payload = post, options = options);
 	}
 
-	function public any refund(required any money, required any transactionId, struct options = {}) {
+	public any function refund(required any money, required any transactionId, struct options = {}) {
 		post = {
 			amount = money.getAmount(),
 			type = "refund",
@@ -977,7 +1007,7 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		return process(payload = post, options = options);
 	}
 
-	function private any addCustomer(required struct post, required any account) {
+	private any function addCustomer(required struct post, required any account) {
 		post.firstname = account.getFirstName();
 		post.lastname = account.getLastName();
 		post.address = account.getAddress();
@@ -992,7 +1022,7 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		return post;
 	}
 
-	function private any addCreditCard(required struct post, required any account, struct options = {}) {
+	private any function addCreditCard(required struct post, required any account, struct options = {}) {
 		post.payment = "creditcard";
 		post.ccnumber = account.getAccount();
 		post.ccexp = "#account.getMonth()#/#right(account.getYear(), 2)#";
@@ -1010,12 +1040,102 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		return post;
 	}
 
-	function private any addToken(required struct post, required any account) {
+	private any function addToken(required struct post, required any account) {
 		post.customer_vault_id = account.getID();
 		return post;
 	}
-	
-	function private string jstr(cfml_string) { 
+
+	private struct function validateAVS(required string avsCodeStreet, required string avsCodePostalCode, boolean allowBlankCode = true, boolean allowPostalOnlyMatch = false, boolean allowStreetOnlyMatch = false) {
+		result = {
+			success = false,
+			message = "",
+			errors = [],
+			valid = false,
+			avs_message = "no avs passed"
+		}	
+
+		if ( allowBlankCode && ( len(avsCodeStreet) == 0 && len(avsCodePostalCode) == 0 ) ) {
+			result.valid = true;
+			result.avs_message = "AVS checks were skipped for this transaction.";
+		} else {
+			try {
+				matching_street_codes = variables.avs_address_response_codes.filter(function(code) {
+					return code.code == avsCodeStreet
+				});
+
+				matching_postal_codes = variables.avs_postalcode_response_codes.filter(function(code) {
+					return code.code == avsCodePostalCode
+				});
+
+				if ( allowStreetOnlyMatch ) {
+					if ( matching_street_codes.len() > 0 ) {
+						match = matching_street_codes.first();
+						result.valid = match.passes;
+						result.avs_message = len(match.description) > 0 ? match.description : match.response;
+					} else {
+						result.errors.append("the AVS Street Code (#avsCodeStreet#) was not found");
+					}
+				} else if ( allowPostalOnlyMatch ) {
+					if ( matching_postal_codes.len() > 0 ) {
+						match = matching_postal_codes.first();
+						result.valid = match.passes;
+						result.avs_message = len(match.description) > 0 ? match.description : match.response;
+					} else {
+						result.errors.append("the AVS PostalCode Code (#avsCodePostalCode#) was not found");
+					}
+				} else {
+					if ( matching_street_codes.len() > 0 && matching_postal_codes.len() > 0 ) {
+						street_match = matching_street_codes.first();
+						postalcode_match = matching_postal_codes.first();
+						result.valid = street_match.passes && postalcode_match.passes;
+						result.avs_message = street_match.passes ? postalcode_match.description : street_match.description;
+					} else {
+						result.errors.append("the AVS PostalCode Code (#avsCodePostalCode#) was not found");
+					}
+				}
+			} catch (Any e) {
+				result.errors.append(e.message);
+			}
+		}
+
+		result.success = result.errors.isEmpty();
+		result.message = result.success ? "The AVS validation was successful." : "The AVS validation was not successful. See the error stack.";
+
+		return result;
+	}
+
+	private struct function validateCVV(required string code) {
+		result = {
+			success = false,
+			message = "",
+			errors = [],
+			valid = false,
+			cvv_message = "no CVV value passed"
+		}	
+
+		try {
+			matching_cvv_codes = variables.cvv_response_codes.filter(function(cvv) {
+				return cvv.code == code
+			});
+
+			if ( matching_cvv_codes.len() > 0 ) {
+				match = matching_cvv_codes.first();
+				result.valid = match.passes;
+				result.cvv_message = len(match.description) > 0 ? match.description : match.response;
+			} else {
+				result.errors.append("the CVV code (#code#) was not found");
+			}
+		} catch (Any e) {
+			result.errors.append(e.message);
+		}
+
+		result.success = result.errors.isEmpty();
+		result.message = result.success ? "The CVV validation was successful." : "The CVV validation was not successful. See the error stack.";
+
+		return result;
+	}
+
+	private string function jstr(cfml_string) { 
 		return javacast("java.lang.String", cfml_string);
 	}
 }

@@ -192,7 +192,7 @@
 	<cffunction name="getPrivateKey" access="package" output="false" returntype="any">
 		<cfreturn variables.cfpayment.PrivateKey />
 	</cffunction>
-	<cffunction name="getPrivateKey" access="package" output="false" returntype="void">
+	<cffunction name="setPrivateKey" access="package" output="false" returntype="void">
 		<cfargument name="PrivateKey" type="any" required="true" />
 		<cfset variables.cfpayment.PrivateKey = arguments.PrivateKey />
 	</cffunction>

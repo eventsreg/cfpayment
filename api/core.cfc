@@ -11,8 +11,8 @@
 		<cftry>
 			<cfset variables.instance.gateway = createObject("component", "gateway.#lCase(variables.instance.config.path)#").init(config = variables.instance.config, service = this) />
 
-			<cfcatch>
-				<cfthrow message="Invalid Gateway Specified" type="cfpayment.InvalidGateway" />
+			<cfcatch type="Any">
+				<cfthrow message="Invalid Gateway Specified (gateway.#lCase(variables.instance.config.path)#). Reason: #serializejson(cfcatch)#" type="cfpayment.InvalidGateway" />
 			</cfcatch>
 		</cftry>
 
