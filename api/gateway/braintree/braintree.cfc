@@ -801,11 +801,13 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		try {
 			env = createObject("java", "com.braintreegateway.Environment", "/jars/braintree-java-2.96.0.jar");
 			gw = createObject("java", "com.braintreegateway.BraintreeGateway", "/jars/braintree-java-2.96.0.jar").init(
-				env.Sandbox,
+				env.Production,
 				getMerchantId(),
 				getPublicKey(),
 				getPrivateKey()
 			);
+
+			//env.Sandbox for testing in a sandbox account
 
 			acct = gw.merchantAccount().find(getMerchantAccountId());
 
