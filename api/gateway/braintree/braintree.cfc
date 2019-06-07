@@ -853,11 +853,11 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 					}, transaction.getProcessorResponseText());
 
 					// if the CVV and/or AVS fails, the message should not be based on the response code, but the CVV/AVS code response
-					avs_status = validateAVS(avsCodeStreet = transaction.getAvsStreetAddressResponseCode(), avsCodePostalCode = transaction.getAvsPostalCodeResponseCode());
-					cvv_status = validateCVV(code = transaction.getCvvResponseCode());
+					avs_status = validateAVS(avsCodeStreet = transaction.getAvsStreetAddressResponseCode(), avsCodePostalCode = transaction.getAvsPostalCodeResponseCode(), rejectionReason = transaction.getGatewayRejectionReason());
+					cvv_status = validateCVV(code = transaction.getCvvResponseCode(), rejectionReason = transaction.getGatewayRejectionReason());
 
 					mapped_response_values = {
-						message = avs_status.valid && cvv_status.valid ? response_code_message : avs_status.valid ? cvv_status.cvv_message : avs_status.avs_message,
+						message = result.isSuccess() ? "Approved" : avs_status.valid && cvv_status.valid ? response_code_message : avs_status.valid ? cvv_status.cvv_message : avs_status.avs_message,
 						authorization_code = transaction.getProcessorAuthorizationCode(),
 						response_code = transaction.getProcessorResponseCode(),
 						response_text = transaction.getProcessorResponseText(),
@@ -869,11 +869,13 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 						cvv_response_code = transaction.getCvvResponseCode(),
 						avs_postalcode_response_code = transaction.getAvsPostalCodeResponseCode(),
 						avs_streetaddress_response_code = transaction.getAvsStreetAddressResponseCode(),
-						transaction_id = transaction.getId()
+						transaction_id = transaction.getId(),
+						status = transaction.getStatus(),
+						status_reason = transaction.getGatewayRejectionReason()
 					}
 
 					response.setStatus(result.isSuccess() ? getService().getStatusSuccessful() : getService().getStatusDeclined());
-					response.setResult(avs_status.valid && cvv_status.valid ? mapped_response_values.response_code & ": " & transaction.getProcessorResponseText() : avs_status.valid ? cvv_status.cvv_message : avs_status.avs_message);
+					response.setResult(result.isSuccess() ? mapped_response_values.status & ": " & mapped_response_values.response_text & ": " & mapped_response_values.response_code : mapped_response_values.status & ": (cvv code => #mapped_response_values.cvv_response_code#, avs street code => #mapped_response_values.avs_streetaddress_response_code#, avs postal code => #mapped_response_values.avs_postalcode_response_code#) " & mapped_response_values.response_code);
 					response.setMessage(mapped_response_values.message);
 					response.setTransactionID(mapped_response_values.transaction_id);
 					response.setAuthorization(mapped_response_values.authorization_code);
@@ -881,7 +883,7 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 					response.setCVVCode(mapped_response_values.cvv_response_code);
 
 				} else if ( payload.type == "void" ) {
-					transaction = gw.transaction().find(jstr(payload.transactionid));
+					transaction = gw.transaction().find(jstr(payload.transactionId));
 					transaction_status = transaction.getStatus().name();
 
 					if ( transaction_status == "AUTHORIZED" || transaction_status == "SUBMITTED_FOR_SETTLEMENT" || transaction_status == "SETTLEMENT_PENDING" ) {
@@ -889,7 +891,7 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 						voided_transaction = result.getTransaction() === Null ? result.getTarget() : result.getTransaction();
 					
 						mapped_response_values = {
-							message = voided_transaction.getMessage() === Null ? "Transaction voided" : voided_transaction.getMessage(),
+							message = result.isSuccess() ? "Transaction voided (original transaction: #transaction.getId()#)" : "Transaction (#transaction.getId()#) not voided",
 							authorization_code = voided_transaction.getProcessorAuthorizationCode(),
 							response_code = voided_transaction.getProcessorResponseCode(),
 							response_text = voided_transaction.getProcessorResponseText(),
@@ -901,7 +903,9 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 							cvv_response_code = voided_transaction.getCvvResponseCode(),
 							avs_postalcode_response_code = voided_transaction.getAvsPostalCodeResponseCode(),
 							avs_streetaddress_response_code = voided_transaction.getAvsStreetAddressResponseCode(),
-							transaction_id = voided_transaction.getId()
+							transaction_id = voided_transaction.getId(),
+							status = transaction.getStatus(),
+							status_reason = transaction.getGatewayRejectionReason()
 						};
 	
 						response.setStatus(result.isSuccess() ? getService().getStatusSuccessful() : getService().getStatusDeclined());	
@@ -912,7 +916,7 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 							response.setTransactionID(mapped_response_values.transaction_id);
 							response.setAuthorization(mapped_response_values.authorization_code);
 							response.setAVSCode(mapped_response_values.avs_streetaddress_response_code);
-							response.setCVVCode(mapped_response.values.cvv_response_code);
+							response.setCVVCode(mapped_response_values.cvv_response_code);
 						}
 					} else {
 						response.setStatus(getService().getStatusDeclined());
@@ -926,7 +930,7 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 						refunded_transaction = result.getTransaction() === Null ? result.getTarget() : result.getTransaction();
 					
 						mapped_response_values = {
-							message = refunded_transaction.getMessage() === Null ? "Transaction voided" : refunded_transaction.getMessage(),
+							message = result.isSuccess() ? "Transaction (#transaction.getId()#) refunded" : "Transaction (#transaction.getId()#) not refunded",
 							authorization_code = refunded_transaction.getProcessorAuthorizationCode(),
 							response_code = refunded_transaction.getProcessorResponseCode(),
 							response_text = refunded_transaction.getProcessorResponseText(),
@@ -938,18 +942,20 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 							cvv_response_code = refunded_transaction.getCvvResponseCode(),
 							avs_postalcode_response_code = refunded_transaction.getAvsPostalCodeResponseCode(),
 							avs_streetaddress_response_code = refunded_transaction.getAvsStreetAddressResponseCode(),
-							transaction_id = refunded_transaction.getId()
+							transaction_id = refunded_transaction.getId(),
+							status = transaction.getStatus(),
+							status_reason = transaction.getGatewayRejectionReason()
 						};
 	
 						response.setStatus(result.isSuccess() ? getService().getStatusSuccessful() : getService().getStatusDeclined());	
 	
 						if ( result.isSuccess() ) {
-							response.setParsedResult("");
+							response.setResult(result.isSuccess() ? mapped_response_values.status & ": " & mapped_response_values.response_text & ": " & mapped_response_values.response_code : mapped_response_values.status & ": " & mapped_response_values.response_code);
 							response.setMessage(mapped_response_values.message);
 							response.setTransactionID(mapped_response_values.transaction_id);
 							response.setAuthorization(mapped_response_values.authorization_code);
 							response.setAVSCode(mapped_response_values.avs_streetaddress_response_code);
-							response.setCVVCode(mapped_response.values.cvv_response_code);
+							response.setCVVCode(mapped_response_values.cvv_response_code);
 						}
 					} else {
 						response.setStatus(getService().getStatusDeclined());	
@@ -988,16 +994,16 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		return process(payload = post, options = options);
 	}
 
-	public any function void(required any transactionId, struct options = {}) {
+	public any function void(required any id, struct options = {}) {
 		post = {
 			type = "void",
-			transactionid = transactionId
+			transactionId = id
 		}
 
 		return process(payload = post, options = options);
 	}
 
-	public any function refund(required any money, required any transactionId, struct options = {}) {
+	public any function credit(required any money, required any transactionId, struct options = {}) {
 		post = {
 			amount = money.getAmount(),
 			type = "refund",
@@ -1045,7 +1051,7 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		return post;
 	}
 
-	private struct function validateAVS(required string avsCodeStreet, required string avsCodePostalCode, boolean allowBlankCode = true, boolean allowPostalOnlyMatch = false, boolean allowStreetOnlyMatch = false) {
+	private struct function validateAVS(required string avsCodeStreet, required string avsCodePostalCode, boolean allowBlankCode = true, boolean allowPostalOnlyMatch = false, boolean allowStreetOnlyMatch = false, string rejectionReason = "") {
 		result = {
 			success = false,
 			message = "",
@@ -1054,47 +1060,52 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 			avs_message = "no avs passed"
 		}	
 
-		if ( allowBlankCode && ( len(avsCodeStreet) == 0 && len(avsCodePostalCode) == 0 ) ) {
-			result.valid = true;
-			result.avs_message = "AVS checks were skipped for this transaction.";
+		if ( len(rejectionReason) > 0 ) {
+			// user account settings have overridden passed status in variables.avs_address_response_codes and variables.avs_postalcode_response_codes
+			result.avs_message = "The street address and/or postal code provided do not match the information on file with the cardholder's bank.";
 		} else {
-			try {
-				matching_street_codes = variables.avs_address_response_codes.filter(function(code) {
-					return code.code == avsCodeStreet
-				});
-
-				matching_postal_codes = variables.avs_postalcode_response_codes.filter(function(code) {
-					return code.code == avsCodePostalCode
-				});
-
-				if ( allowStreetOnlyMatch ) {
-					if ( matching_street_codes.len() > 0 ) {
-						match = matching_street_codes.first();
-						result.valid = match.passes;
-						result.avs_message = len(match.description) > 0 ? match.description : match.response;
+			if ( allowBlankCode && ( len(avsCodeStreet) == 0 && len(avsCodePostalCode) == 0 ) ) {
+				result.valid = true;
+				result.avs_message = "AVS checks were skipped for this transaction.";
+			} else {
+				try {
+					matching_street_codes = variables.avs_address_response_codes.filter(function(code) {
+						return code.code == avsCodeStreet
+					});
+	
+					matching_postal_codes = variables.avs_postalcode_response_codes.filter(function(code) {
+						return code.code == avsCodePostalCode
+					});
+	
+					if ( allowStreetOnlyMatch ) {
+						if ( matching_street_codes.len() > 0 ) {
+							match = matching_street_codes.first();
+							result.valid = match.passes;
+							result.avs_message = len(match.description) > 0 ? match.description : match.response;
+						} else {
+							result.errors.append("the AVS Street Code (#avsCodeStreet#) was not found");
+						}
+					} else if ( allowPostalOnlyMatch ) {
+						if ( matching_postal_codes.len() > 0 ) {
+							match = matching_postal_codes.first();
+							result.valid = match.passes;
+							result.avs_message = len(match.description) > 0 ? match.description : match.response;
+						} else {
+							result.errors.append("the AVS PostalCode Code (#avsCodePostalCode#) was not found");
+						}
 					} else {
-						result.errors.append("the AVS Street Code (#avsCodeStreet#) was not found");
+						if ( matching_street_codes.len() > 0 && matching_postal_codes.len() > 0 ) {
+							street_match = matching_street_codes.first();
+							postalcode_match = matching_postal_codes.first();
+							result.valid = street_match.passes && postalcode_match.passes;
+							result.avs_message = street_match.passes ? postalcode_match.description : street_match.description;
+						} else {
+							result.errors.append("the AVS PostalCode Code (#avsCodePostalCode#) was not found");
+						}
 					}
-				} else if ( allowPostalOnlyMatch ) {
-					if ( matching_postal_codes.len() > 0 ) {
-						match = matching_postal_codes.first();
-						result.valid = match.passes;
-						result.avs_message = len(match.description) > 0 ? match.description : match.response;
-					} else {
-						result.errors.append("the AVS PostalCode Code (#avsCodePostalCode#) was not found");
-					}
-				} else {
-					if ( matching_street_codes.len() > 0 && matching_postal_codes.len() > 0 ) {
-						street_match = matching_street_codes.first();
-						postalcode_match = matching_postal_codes.first();
-						result.valid = street_match.passes && postalcode_match.passes;
-						result.avs_message = street_match.passes ? postalcode_match.description : street_match.description;
-					} else {
-						result.errors.append("the AVS PostalCode Code (#avsCodePostalCode#) was not found");
-					}
+				} catch (Any e) {
+					result.errors.append(e.message);
 				}
-			} catch (Any e) {
-				result.errors.append(e.message);
 			}
 		}
 
@@ -1104,7 +1115,7 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 		return result;
 	}
 
-	private struct function validateCVV(required string code) {
+	private struct function validateCVV(required string code, string rejectionReason = "") {
 		result = {
 			success = false,
 			message = "",
@@ -1113,20 +1124,25 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 			cvv_message = "no CVV value passed"
 		}	
 
-		try {
-			matching_cvv_codes = variables.cvv_response_codes.filter(function(cvv) {
-				return cvv.code == code
-			});
+		if ( len(rejectionReason) > 0 ) {
+			// user account settings have overridden passed status in variables.cvv_response_codes
+			result.cvv_message = "The card security code provided does not match the information on file with the cardholder's bank.";
+		} else {
+			try {
+				matching_cvv_codes = variables.cvv_response_codes.filter(function(cvv) {
+					return cvv.code == code
+				});
 
-			if ( matching_cvv_codes.len() > 0 ) {
-				match = matching_cvv_codes.first();
-				result.valid = match.passes;
-				result.cvv_message = len(match.description) > 0 ? match.description : match.response;
-			} else {
-				result.errors.append("the CVV code (#code#) was not found");
+				if ( matching_cvv_codes.len() > 0 ) {
+					match = matching_cvv_codes.first();
+					result.valid = match.passes;
+					result.cvv_message = len(match.description) > 0 ? match.description : match.response;
+				} else {
+					result.errors.append("the CVV code (#code#) was not found");
+				}
+			} catch (Any e) {
+				result.errors.append(e.message);
 			}
-		} catch (Any e) {
-			result.errors.append(e.message);
 		}
 
 		result.success = result.errors.isEmpty();
