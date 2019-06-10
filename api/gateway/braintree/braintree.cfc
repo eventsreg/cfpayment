@@ -800,14 +800,22 @@ component displayname="Braintree Interface" extends="cfpayment.api.gateway.base"
 
 		try {
 			env = createObject("java", "com.braintreegateway.Environment", "/jars/braintree-java-2.96.0.jar");
-			gw = createObject("java", "com.braintreegateway.BraintreeGateway", "/jars/braintree-java-2.96.0.jar").init(
-				env.Production,
-				getMerchantId(),
-				getPublicKey(),
-				getPrivateKey()
-			);
 
-			//env.Sandbox for testing in a sandbox account
+			if ( response_args.TestMode ) {
+				gw = createObject("java", "com.braintreegateway.BraintreeGateway", "/jars/braintree-java-2.96.0.jar").init(
+					env.Sandbox,
+					getMerchantId(),
+					getPublicKey(),
+					getPrivateKey()
+				);
+			} else {
+				gw = createObject("java", "com.braintreegateway.BraintreeGateway", "/jars/braintree-java-2.96.0.jar").init(
+					env.Production,
+					getMerchantId(),
+					getPublicKey(),
+					getPrivateKey()
+				);
+			}
 
 			acct = gw.merchantAccount().find(getMerchantAccountId());
 
