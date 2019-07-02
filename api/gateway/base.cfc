@@ -46,7 +46,8 @@
 	<cfset variables.cfpayment.PrivateKey = "" />
 	<cfset variables.cfpayment.Timeout = 600 />
 	<cfset variables.cfpayment.TestMode = true />
-	
+	<cfset variables.cfpayment.CurrencyCode = "USD" />
+	<cfset variables.cfpayment.CurrencyCodeNumber = "840" /> <!--- Used by PayflowPro --->
 	
 	<!--- it's possible access to internal java objects is disabled, so we account for that --->
 	<cftry>
@@ -57,7 +58,6 @@
 			<cfset variables.rcMonitorEnabled = false />
 		</cfcatch>
 	</cftry>
-
 
 	<cffunction name="init" access="public" output="false" returntype="any">
 		<cfargument name="service" type="any" required="true" />
@@ -166,6 +166,13 @@
 		<cfargument name="Vendor" type="any" required="true" />
 		<cfset variables.cfpayment.Vendor = arguments.Vendor />
 	</cffunction>
+	<cffunction name="getCurrencyCodeNumber" access="package" output="false" returntype="any">
+		<cfreturn variables.cfpayment.CurrencyCodeNumber />
+	</cffunction>
+	<cffunction name="setCurrencyCodeNumber" access="package" output="false" returntype="void">
+		<cfargument name="CurrencyCodeNumber" type="any" required="true" />
+		<cfset variables.cfpayment.CurrencyCodeNumber = arguments.CurrencyCodeNumber />
+	</cffunction>
 
 	<!--- merchant account id (aka name), merchant id, public key, and private key are used by Braintree gateway --->
 	<cffunction name="getMerchantAccountId" access="package" output="false" returntype="any">
@@ -195,6 +202,15 @@
 	<cffunction name="setPrivateKey" access="package" output="false" returntype="void">
 		<cfargument name="PrivateKey" type="any" required="true" />
 		<cfset variables.cfpayment.PrivateKey = arguments.PrivateKey />
+	</cffunction>
+
+	<!--- Generic currency getter/setter --->
+	<cffunction name="getCurrencyCode" access="package" output="false" returntype="any">
+		<cfreturn variables.cfpayment.CurrencyCode />
+	</cffunction>
+	<cffunction name="setCurrencyCode" access="package" output="false" returntype="void">
+		<cfargument name="CurrencyCode" type="any" required="true" />
+		<cfset variables.cfpayment.CurrencyCode = arguments.CurrencyCode />
 	</cffunction>
 
 	<!--- the gatewayid is a value used by the transaction/HA apis to differentiate

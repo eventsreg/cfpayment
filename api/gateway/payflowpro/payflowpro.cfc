@@ -255,15 +255,15 @@
 															<Zip>#xmlFormat(arguments.account.getPostalCode())#</Zip>
 															<Country>#xmlformat(arguments.account.getCountry())#</Country>
 														</Address>
-														<cfif structkeyexists(arguments.options, "email") and isvalid("email",arguments.options["email"])><EMail>#xmlformat(arguments.options["email"])#</EMail></cfif>
+														<cfif structkeyexists(arguments.options, "email") and isvalid("email",arguments.options.email)><EMail>#xmlformat(arguments.options.email)#</EMail></cfif>
 													</BillTo>
 													<TotalAmt>#arguments.money.getAmount()#</TotalAmt>
-													<cfif structkeyexists(arguments.options,"description")><Description>#xmlformat(arguments.options["description"])#</Description></cfif>
-													<cfif structkeyexists(arguments.options,"comments")><Comment>#xmlformat(arguments.options["comments"])#</Comment></cfif>
+													<cfif structkeyexists(arguments.options,"description")><Description>#xmlformat(arguments.options.description)#</Description></cfif>
+													<cfif structkeyexists(arguments.options,"comments")><Comment>#xmlformat(arguments.options.comments & "; currency code passed: #getCurrencyCodeNumber()#")#</Comment></cfif>
 												</Invoice>
 												<Tender>
 													<Card>
-														<CardType>#arguments.options["cardType"]#</CardType>
+														<CardType>#arguments.options.cardType#</CardType>
 														<CardNum>#arguments.account.getAccount()#</CardNum>
 														<ExpDate>#arguments.account.getYear()##arguments.account.getMonth()#</ExpDate>
 														<CVNum>#xmlformat(arguments.account.getVerificationValue())#</CVNum>
